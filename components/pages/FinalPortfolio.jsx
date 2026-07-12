@@ -29,6 +29,11 @@ function pctFor(skill, i) {
   return 60 + (seed % 36);
 }
 
+function normalizeUrl(url) {
+  if (!url) return "";
+  return url.match(/^https?:\/\//i) ? url : `https://${url}`;
+}
+
 const DEFAULT_ORDER = ["hero", "about", "skills", "projects", "contact"];
 
 function Photo({ d, className }) {
@@ -46,6 +51,58 @@ function SocialRow({ d, light }) {
       {d.github && <span className="hero-social-badge">GH</span>}
       {d.linkedin && <span className="hero-social-badge">in</span>}
       {d.email && <span className="hero-social-badge">@</span>}
+    </div>
+  );
+}
+
+/* ---- Minimal, generic (non-brand-logo) icon set for footer ---- */
+const IconMail = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <rect x="3" y="5" width="18" height="14" rx="2" />
+    <path d="M3 7l9 6 9-6" />
+  </svg>
+);
+const IconGithub = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2-.2 4-1 4-4.5 0-1-.4-2-1-2.7.1-.3.4-1.4-.1-2.8 0 0-.9-.3-3 1a10 10 0 0 0-5.4 0c-2.1-1.3-3-1-3-1-.5 1.4-.2 2.5-.1 2.8-.6.7-1 1.7-1 2.7 0 3.5 2 4.3 4 4.5-.4.4-.5.8-.5 1.5V19" />
+  </svg>
+);
+const IconLinkedin = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <rect x="3" y="3" width="18" height="18" rx="3" />
+    <path d="M7.5 10.5v6M7.5 7.5v.01M12 16.5V13c0-1.5 1-2.5 2.3-2.5s2.2 1 2.2 2.5v3.5" />
+  </svg>
+);
+const IconFacebook = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <path d="M15 8h-2a2 2 0 0 0-2 2v2H9v3h2v6h3v-6h2.2l.8-3H14v-1.5c0-.6.3-1 1-1h1.5V8Z" />
+  </svg>
+);
+
+function FooterSocials({ d }) {
+  const items = [
+    d.email && { icon: <IconMail />, href: `mailto:${d.email}`, label: "Email" },
+    d.github && { icon: <IconGithub />, href: normalizeUrl(d.github), label: "GitHub" },
+    d.linkedin && { icon: <IconLinkedin />, href: normalizeUrl(d.linkedin), label: "LinkedIn" },
+    d.facebook && { icon: <IconFacebook />, href: normalizeUrl(d.facebook), label: "Facebook" },
+  ].filter(Boolean);
+
+  if (!items.length) return null;
+
+  return (
+    <div className="p-footer-socials">
+      {items.map((it, i) => (
+        <a
+          key={i}
+          href={it.href}
+          target={it.label === "Email" ? undefined : "_blank"}
+          rel="noopener noreferrer"
+          aria-label={it.label}
+          className="p-social-icon"
+        >
+          {it.icon}
+        </a>
+      ))}
     </div>
   );
 }
@@ -218,8 +275,6 @@ export default function FinalPortfolio() {
     dispatch({ type: "GO_TO", page: "published" });
   }
 
-  // Merge AI-generated copy (title/description/techStack) with the raw
-  // form data (image/link) for each project, matched by index.
   const mergedProjects = (c.projectDescriptions || []).map((p, i) => {
     const raw = d.projects[i] || {};
     return {
@@ -227,7 +282,7 @@ export default function FinalPortfolio() {
       description: p.description,
       techStack: p.techStack,
       image: raw.image || "",
-      link: raw.link || "",
+      link: normalizeUrl(raw.link || ""),
     };
   });
 
@@ -253,45 +308,40 @@ export default function FinalPortfolio() {
         </div>
       </div>
     ),
-   projects: (
+    projects: (
       <div className="p-section" id="p-projects" key="projects">
         <div className="p-eyebrow">PROJECTS</div>
         <div className={`p-projects ${layout.projects}`}>
           {mergedProjects.length ? (
             mergedProjects.map((p, i) => {
-              const safeLink = p.link
-                ? p.link.match(/^https?:\/\//i)
-                  ? p.link
-                  : `https://${p.link}`
-                : "";
-              const CardTag = safeLink ? "a" : "div";
-              const cardProps = safeLink
-                ? { href: safeLink, target: "_blank", rel: "noopener noreferrer" }
+              const CardTag = p.link ? "a" : "div";
+              const cardProps = p.link
+                ? { href: p.link, target: "_blank", rel: "noopener noreferrer" }
                 : {};
               return (
                 <CardTag className="p-proj" key={i} {...cardProps}>
-                  {p.image ? (
-                    <div
-                      className="p-proj-img"
-                      style={{
-                        backgroundImage: `url(${p.image})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        width: "100%",
-                        aspectRatio: "16 / 10",
-                        borderRadius: 10,
-                        marginBottom: 14,
-                      }}
-                    />
-                  ) : null}
-                  <h4>{p.title}</h4>
-                  <p>{p.description}</p>
-                  <div className="chips">
-                    {p.techStack.map((t, ti) => (
-                      <span key={ti}>{t}</span>
-                    ))}
+                  <div
+                    className={`p-proj-img ${!p.image ? "empty" : ""}`}
+                    style={p.image ? { backgroundImage: `url(${p.image})` } : undefined}
+                  >
+                    {!p.image && <span>{initials(p.title || "Project")}</span>}
                   </div>
-                  {safeLink && <span className="p-proj-link mono">View live →</span>}
+                  <div className="p-proj-body">
+                    <h4>{p.title}</h4>
+                    <p>{p.description}</p>
+                    {p.techStack?.length > 0 && (
+                      <div className="chips">
+                        {p.techStack.map((t, ti) => (
+                          <span key={ti}>{t}</span>
+                        ))}
+                      </div>
+                    )}
+                    {p.link && (
+                      <span className="p-proj-link mono">
+                        View live <span className="arrow">→</span>
+                      </span>
+                    )}
+                  </div>
                 </CardTag>
               );
             })
@@ -354,10 +404,11 @@ export default function FinalPortfolio() {
       <div className="p-contact" id="p-contact" key="contact">
         <div className="p-eyebrow" style={{ justifyContent: "center", display: "flex" }}>GET IN TOUCH</div>
         <div className="links">
-          {d.email && <a href="#">{d.email}</a>}
-          {d.github && <a href="#">{d.github}</a>}
-          {d.linkedin && <a href="#">{d.linkedin}</a>}
+          {d.email && <a href={`mailto:${d.email}`}>{d.email}</a>}
+          {d.github && <a href={normalizeUrl(d.github)} target="_blank" rel="noopener noreferrer">{d.github}</a>}
+          {d.linkedin && <a href={normalizeUrl(d.linkedin)} target="_blank" rel="noopener noreferrer">{d.linkedin}</a>}
         </div>
+        <FooterSocials d={d} />
       </div>
     ),
   };
@@ -399,6 +450,7 @@ export default function FinalPortfolio() {
               <div className="p-footer-brand">
                 <div className="p-footer-name">{d.name || "Your Name"}</div>
                 <div className="p-footer-tag">{c.tagline}</div>
+                <FooterSocials d={d} />
               </div>
               <div className="p-footer-col">
                 <div className="p-footer-heading">Navigation</div>
@@ -408,9 +460,9 @@ export default function FinalPortfolio() {
               </div>
               <div className="p-footer-col">
                 <div className="p-footer-heading">Contact</div>
-                {d.email && <a href="#">{d.email}</a>}
-                {d.github && <a href="#">{d.github}</a>}
-                {d.linkedin && <a href="#">{d.linkedin}</a>}
+                {d.email && <a href={`mailto:${d.email}`}>{d.email}</a>}
+                {d.github && <a href={normalizeUrl(d.github)} target="_blank" rel="noopener noreferrer">{d.github}</a>}
+                {d.linkedin && <a href={normalizeUrl(d.linkedin)} target="_blank" rel="noopener noreferrer">{d.linkedin}</a>}
               </div>
             </div>
             <div className="p-footer-bottom">

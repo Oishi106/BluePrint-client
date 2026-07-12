@@ -18,6 +18,7 @@ const initialState = {
     email: "",
     github: "",
     linkedin: "",
+    facebook: "",
   },
   content: null,
   mode: null, // 'template' | 'ai-layout'

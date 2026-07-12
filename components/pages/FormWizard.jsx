@@ -364,6 +364,15 @@ export default function FormWizard() {
                   onChange={(e) => setField("linkedin", e.target.value)}
                 />
               </div>
+              <div className="field-group">
+                <label>Facebook</label>
+                <input
+                  type="text"
+                  placeholder="facebook.com/username"
+                  value={d.facebook}
+                  onChange={(e) => setField("facebook", e.target.value)}
+                />
+              </div>
             </div>
           </div>
         )}
