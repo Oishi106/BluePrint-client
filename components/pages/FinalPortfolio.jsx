@@ -330,23 +330,27 @@ export default function FinalPortfolio() {
   const previewUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/portfolio/${slugBase}`;
 
   async function publish() {
-    if (!state.portfolioId) {
-      setErrorMsg("No saved draft found — go back a step so it can be saved first.");
-      return;
-    }
-    setPublishing(true);
-    setErrorMsg("");
-    try {
-      const res = await publishPortfolio(state.portfolioId, slugBase);
-      dispatch({ type: "PUBLISH", slug: res.slug });
-      dispatch({ type: "GO_TO", page: "published" });
-    } catch (err) {
-      console.error("Publish failed:", err);
-      setErrorMsg("Couldn't publish — check the server is running and try again.");
-    } finally {
-      setPublishing(false);
-    }
+  if (!state.portfolioId) {
+    setErrorMsg("No saved draft found — go back a step so it can be saved first.");
+    return;
   }
+  setPublishing(true);
+  setErrorMsg("");
+  try {
+    const res = await publishPortfolio(state.portfolioId, slugBase, {
+      mode: state.mode,
+      selectedTemplate: state.selectedTemplate,
+      layoutJson: state.layoutJson,
+    });
+    dispatch({ type: "PUBLISH", slug: res.slug });
+    dispatch({ type: "GO_TO", page: "published" });
+  } catch (err) {
+    console.error("Publish failed:", err);
+    setErrorMsg("Couldn't publish — check the server is running and try again.");
+  } finally {
+    setPublishing(false);
+  }
+}
 
   const mergedProjects = (c.projectDescriptions || []).map((p, i) => {
     const raw = d.projects[i] || {};
