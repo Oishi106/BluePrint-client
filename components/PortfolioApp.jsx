@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { PortfolioProvider, usePortfolioState } from "@/context/PortfolioContext";
 import Header from "@/components/Header";
+import UrlSync from "@/components/UrlSync";
 import Landing from "@/components/pages/Landing";
 import FormWizard from "@/components/pages/FormWizard";
 import Generating from "@/components/pages/Generating";
@@ -44,6 +45,7 @@ function AppShell() {
       </div>
 
       <Header />
+      <UrlSync />
 
       {Object.entries(pages).map(([key, node]) => (
         <section key={key} className={`page ${state.page === key ? "active" : ""}`}>

@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { usePortfolioState, usePortfolioDispatch } from "@/context/PortfolioContext";
+import BackButton from "@/components/BackButton";
 
-const STEP_LABELS = ["Basics", "Skills", "Projects", "Education", "Contact"];
-const TOTAL_STEPS = 5;
+const STEP_LABELS = ["Basics", "Skills", "Projects", "Education", "Extras", "Contact"];
+const TOTAL_STEPS = 6;
 
 export default function FormWizard() {
   const state = usePortfolioState();
@@ -19,24 +20,26 @@ export default function FormWizard() {
     dispatch({ type: "SET_FIELD", field, value });
   }
 
-  function handlePhotoChange(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (d.photoUrl) URL.revokeObjectURL(d.photoUrl);
-    const url = URL.createObjectURL(file);
-    setField("photoFile", file);
-    setField("photoUrl", url);
-  }
+function handlePhotoChange(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    // base64 data URL — works for instant preview AND can be sent to the server as-is
+    setField("photoUrl", reader.result);
+  };
+  reader.readAsDataURL(file);
+}
 
-  function handleProjectImageChange(index, e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const currentImage = d.projects[index]?.image;
-    if (currentImage) URL.revokeObjectURL(currentImage);
-    const url = URL.createObjectURL(file);
-    dispatch({ type: "UPDATE_PROJECT", index, field: "imageFile", value: file });
-    dispatch({ type: "UPDATE_PROJECT", index, field: "image", value: url });
-  }
+ function handleProjectImageChange(index, e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    dispatch({ type: "UPDATE_PROJECT", index, field: "image", value: reader.result });
+  };
+  reader.readAsDataURL(file);
+}
 
   function validateStep(s) {
     if (s === 1 && (!d.name.trim() || !d.role.trim())) {
@@ -70,6 +73,9 @@ export default function FormWizard() {
 
   return (
     <div className="wrap" style={{ maxWidth: 720 }}>
+      <div className="page-back-row">
+        <BackButton label="← Back to start" />
+      </div>
       <div className="eyebrow">PHASE 01 — INPUT</div>
       <h2 style={{ fontSize: 28, marginBottom: 36 }}>Tell us about you</h2>
 
@@ -81,7 +87,7 @@ export default function FormWizard() {
             <div className={cls} key={label}>
               <div className="circle mono">{n < step ? "✓" : n}</div>
               <span className="lbl">{label.toUpperCase()}</span>
-              {n < 5 && <div className="bar" />}
+              {n < STEP_LABELS.length && <div className="bar" />}
             </div>
           );
         })}
@@ -336,6 +342,94 @@ export default function FormWizard() {
 
         {step === 5 && (
           <div className="form-step">
+            <label
+              style={{
+                display: "block",
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                color: "var(--muted)",
+                textTransform: "uppercase",
+                marginBottom: 4,
+              }}
+            >
+              Services
+            </label>
+            <div className="hint" style={{ marginBottom: 16 }}>
+              Used only by the Glassmorphism templates. Add as many or as few as you like — e.g. Website Development, App Development, Website Hosting.
+            </div>
+
+            {d.services.map((s, i) => (
+              <div className="repeat-card" key={i} style={{ padding: 14 }}>
+                <button
+                  type="button"
+                  className="rm-btn"
+                  onClick={() => dispatch({ type: "REMOVE_SERVICE", index: i })}
+                >
+                  ×
+                </button>
+                <div className="field-group" style={{ marginBottom: 0 }}>
+                  <label>Service {i + 1}</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Website Development"
+                    value={s.title}
+                    onChange={(e) =>
+                      dispatch({ type: "UPDATE_SERVICE", index: i, value: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+            <button type="button" className="add-row-btn" onClick={() => dispatch({ type: "ADD_SERVICE" })}>
+              + Add service
+            </button>
+
+            <label
+              style={{
+                display: "block",
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                color: "var(--muted)",
+                textTransform: "uppercase",
+                margin: "30px 0 12px",
+              }}
+            >
+              Stats
+            </label>
+            <div className="two-col">
+              <div className="field-group">
+                <label>Completed projects</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 120+"
+                  value={d.stats.projects}
+                  onChange={(e) => dispatch({ type: "SET_STAT", field: "projects", value: e.target.value })}
+                />
+              </div>
+              <div className="field-group">
+                <label>Client satisfaction</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 95%"
+                  value={d.stats.satisfaction}
+                  onChange={(e) => dispatch({ type: "SET_STAT", field: "satisfaction", value: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="field-group">
+              <label>Years of experience</label>
+              <input
+                type="text"
+                placeholder="e.g. 10+"
+                value={d.stats.years}
+                onChange={(e) => dispatch({ type: "SET_STAT", field: "years", value: e.target.value })}
+              />
+            </div>
+          </div>
+        )}
+
+        {step === 6 && (
+          <div className="form-step">
             <div className="field-group">
               <label>Email</label>
               <input
@@ -364,15 +458,15 @@ export default function FormWizard() {
                   onChange={(e) => setField("linkedin", e.target.value)}
                 />
               </div>
-              <div className="field-group">
-                <label>Facebook</label>
-                <input
-                  type="text"
-                  placeholder="facebook.com/username"
-                  value={d.facebook}
-                  onChange={(e) => setField("facebook", e.target.value)}
-                />
-              </div>
+            </div>
+            <div className="field-group">
+              <label>Facebook</label>
+              <input
+                type="text"
+                placeholder="facebook.com/username"
+                value={d.facebook}
+                onChange={(e) => setField("facebook", e.target.value)}
+              />
             </div>
           </div>
         )}
@@ -394,3 +488,8 @@ export default function FormWizard() {
     </div>
   );
 }
+
+
+
+
+

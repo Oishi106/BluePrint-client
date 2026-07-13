@@ -1,11 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { usePortfolioState, usePortfolioDispatch } from "@/context/PortfolioContext";
-import { TEMPLATES } from "@/lib/templates";
-import { generateLayoutFromPrompt } from "@/lib/mockAI";
-import { publishPortfolio } from "@/lib/api";
-import BackButton from "@/components/BackButton";
 
 function initials(name) {
   return (name || "?")
@@ -14,16 +9,6 @@ function initials(name) {
     .slice(0, 2)
     .map((w) => w[0].toUpperCase())
     .join("");
-}
-
-function slugify(name) {
-  return (
-    (name || "draft")
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "") || "draft"
-  );
 }
 
 function pctFor(skill, i) {
@@ -112,7 +97,7 @@ function FooterSocials({ d }) {
   return (
     <div className="p-footer-socials">
       {items.map((it, i) => (
-        <a
+      <a      
           key={i}
           href={it.href}
           target={it.label === "Email" ? undefined : "_blank"}
@@ -283,37 +268,8 @@ function renderHero(flavor, d, c) {
   }
 }
 
-export default function FinalPortfolio() {
-  const state = usePortfolioState();
-  const dispatch = usePortfolioDispatch();
-  const [publishing, setPublishing] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const d = state.data;
-  const c = state.content;
-
-  if (!c) {
-    return (
-      <div className="wrap">
-        <div className="page-back-row">
-          <BackButton label="← Back to form" />
-        </div>
-        <p style={{ color: "var(--muted)" }}>Nothing to preview yet — go back and fill out the form.</p>
-      </div>
-    );
-  }
-
-  let layout, extraClass, flavor;
-  if (state.mode === "template") {
-    const t = TEMPLATES.find((t) => t.id === state.selectedTemplate) || TEMPLATES[0];
-    layout = t.layout;
-    extraClass = t.cls;
-    flavor = t.flavor;
-  } else {
-    layout = state.layoutJson || generateLayoutFromPrompt("minimal");
-    extraClass = "tmpl-ailayout";
-    flavor = "editorial";
-  }
-
+// d = data, c = content, layout = { hero, about, projects, skills, order, theme }, flavor = template flavor id, frameClass = tmpl-* class
+export default function PortfolioRenderer({ d, c, layout, flavor, frameClass }) {
   const isGlass = flavor === "glass";
   const order = layout.order || DEFAULT_ORDER;
   const theme = layout.theme;
@@ -325,28 +281,6 @@ export default function FinalPortfolio() {
     "--p-accent": theme.accentColor,
     "--p-font": theme.font,
   };
-
-  const slugBase = slugify(d.name);
-  const previewUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/portfolio/${slugBase}`;
-
-  async function publish() {
-    if (!state.portfolioId) {
-      setErrorMsg("No saved draft found — go back a step so it can be saved first.");
-      return;
-    }
-    setPublishing(true);
-    setErrorMsg("");
-    try {
-      const res = await publishPortfolio(state.portfolioId, slugBase);
-      dispatch({ type: "PUBLISH", slug: res.slug });
-      dispatch({ type: "GO_TO", page: "published" });
-    } catch (err) {
-      console.error("Publish failed:", err);
-      setErrorMsg("Couldn't publish — check the server is running and try again.");
-    } finally {
-      setPublishing(false);
-    }
-  }
 
   const mergedProjects = (c.projectDescriptions || []).map((p, i) => {
     const raw = d.projects[i] || {};
@@ -590,75 +524,44 @@ export default function FinalPortfolio() {
   };
 
   return (
-    <div className="wrap" style={{ maxWidth: 1040 }}>
-      <div className="page-back-row">
-        <BackButton label={state.mode === "template" ? "← Back to templates" : "← Back to AI layout"} />
-      </div>
-      <div className="eyebrow">PHASE 04 — PREVIEW &amp; PUBLISH</div>
-      <div className="portfolio-toolbar">
-        <h2 style={{ fontSize: 24 }}>Your portfolio is ready</h2>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button className="btn ghost small" onClick={() => dispatch({ type: "GO_TO", page: "preview" })}>
-            ← Edit content
-          </button>
-          <button className="btn small" onClick={publish} disabled={publishing}>
-            {publishing ? "Publishing…" : "Publish & get link →"}
-          </button>
+    <div className={`portfolio-frame ${frameClass}`} style={frameStyle}>
+      <nav className="p-nav">
+        <div className="p-nav-mark">{initials(d.name)}</div>
+        <div className="p-nav-name">{d.name || "Your Name"}</div>
+        <div className="p-nav-links">
+          <a href="#p-about">About</a>
+          <a href="#p-skills">Skills</a>
+          <a href="#p-projects">Projects</a>
+          <a href="#p-contact">Contact</a>
         </div>
-      </div>
+      </nav>
 
-      {errorMsg && (
-        <p style={{ color: "var(--danger)", fontSize: 12.5, fontFamily: "var(--font-mono)", marginBottom: 14 }}>
-          {errorMsg}
-        </p>
-      )}
+      {order.map((key) => sections[key] || null)}
 
-      <div className="portfolio-frame-outer">
-        <div className="pf-browser-bar">
-          <span></span><span></span><span></span>
-          <div className="pf-browser-url mono">{previewUrl}</div>
+      <footer className="p-footer">
+        <div className="p-footer-top">
+          <div className="p-footer-brand">
+            <div className="p-footer-name">{d.name || "Your Name"}</div>
+            <div className="p-footer-tag">{c.tagline}</div>
+            <FooterSocials d={d} />
+          </div>
+          <div className="p-footer-col">
+            <div className="p-footer-heading">Navigation</div>
+            <a href="#p-about">About</a>
+            <a href="#p-skills">Skills</a>
+            <a href="#p-projects">Projects</a>
+          </div>
+          <div className="p-footer-col">
+            <div className="p-footer-heading">Contact</div>
+            {d.email && <a href={`mailto:${d.email}`}>{d.email}</a>}
+            {d.github && <a href={normalizeUrl(d.github)} target="_blank" rel="noopener noreferrer">{d.github}</a>}
+            {d.linkedin && <a href={normalizeUrl(d.linkedin)} target="_blank" rel="noopener noreferrer">{d.linkedin}</a>}
+          </div>
         </div>
-
-        <div className={`portfolio-frame ${extraClass}`} style={frameStyle}>
-          <nav className="p-nav">
-            <div className="p-nav-mark">{initials(d.name)}</div>
-            <div className="p-nav-name">{d.name || "Your Name"}</div>
-            <div className="p-nav-links">
-              <a href="#p-about">About</a>
-              <a href="#p-skills">Skills</a>
-              <a href="#p-projects">Projects</a>
-              <a href="#p-contact">Contact</a>
-            </div>
-          </nav>
-
-          {order.map((key) => sections[key] || null)}
-
-          <footer className="p-footer">
-            <div className="p-footer-top">
-              <div className="p-footer-brand">
-                <div className="p-footer-name">{d.name || "Your Name"}</div>
-                <div className="p-footer-tag">{c.tagline}</div>
-                <FooterSocials d={d} />
-              </div>
-              <div className="p-footer-col">
-                <div className="p-footer-heading">Navigation</div>
-                <a href="#p-about">About</a>
-                <a href="#p-skills">Skills</a>
-                <a href="#p-projects">Projects</a>
-              </div>
-              <div className="p-footer-col">
-                <div className="p-footer-heading">Contact</div>
-                {d.email && <a href={`mailto:${d.email}`}>{d.email}</a>}
-                {d.github && <a href={normalizeUrl(d.github)} target="_blank" rel="noopener noreferrer">{d.github}</a>}
-                {d.linkedin && <a href={normalizeUrl(d.linkedin)} target="_blank" rel="noopener noreferrer">{d.linkedin}</a>}
-              </div>
-            </div>
-            <div className="p-footer-bottom">
-              © {new Date().getFullYear()} {d.name || "Your Name"} — built with Blueprint
-            </div>
-          </footer>
+        <div className="p-footer-bottom">
+          © {new Date().getFullYear()} {d.name || "Your Name"} — built with Blueprint
         </div>
-      </div>
+      </footer>
     </div>
   );
 }
