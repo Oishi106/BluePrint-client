@@ -3,6 +3,7 @@
 import { usePortfolioState, usePortfolioDispatch } from "@/context/PortfolioContext";
 import { TEMPLATES } from "@/lib/templates";
 import { generateLayoutFromPrompt } from "@/lib/mockAI";
+import { useMemo, useCallback, useState } from "react";
 
 function initials(name) {
   return (name || "?")
@@ -23,11 +24,6 @@ function slugify(name) {
   );
 }
 
-function pctFor(skill, i) {
-  let seed = i * 17;
-  for (let c = 0; c < skill.length; c++) seed += skill.charCodeAt(c);
-  return 60 + (seed % 36);
-}
 
 function normalizeUrl(url) {
   if (!url) return "";
@@ -37,9 +33,10 @@ function normalizeUrl(url) {
 const DEFAULT_ORDER = ["hero", "about", "skills", "projects", "contact"];
 
 function Photo({ d, className }) {
+  const [imgError, setImgError] = useState(false);
   return (
     <div className={`hero-photo-circle ${className || ""}`}>
-      {d.photoUrl ? <img src={d.photoUrl} alt={d.name || "Profile photo"} /> : initials(d.name)}
+      {d.photoUrl && !imgError ? <img src={d.photoUrl} alt={d.name || "Profile photo"} onError={() => setImgError(true)} /> : initials(d.name)}
     </div>
   );
 }
@@ -99,6 +96,7 @@ function FooterSocials({ d }) {
           rel="noopener noreferrer"
           aria-label={it.label}
           className="p-social-icon"
+          style={{ minWidth: 44, minHeight: 44, display: "inline-flex", alignItems: "center", justifyContent: "center" }}
         >
           {it.icon}
         </a>
@@ -108,15 +106,14 @@ function FooterSocials({ d }) {
 }
 
 function renderHero(flavor, d, c) {
-  const skillsCount = d.skills.length;
-  const projectsCount = d.projects.length;
+  const skillsCount = d.skills?.length || 0;
+  const projectsCount = d.projects?.length || 0;
 
   switch (flavor) {
     case "developer":
       return (
         <div className="p-hero-flavor p-hero-developer">
           <div>
-            <div className="p-eyebrow">HI, I AM</div>
             <h1>{d.name || "Your Name"}</h1>
             <div className="hero-dev-role">{d.role || "Developer"}</div>
             <p className="hero-dev-text">{c.heroText}</p>
@@ -143,7 +140,6 @@ function renderHero(flavor, d, c) {
       return (
         <div className="p-hero-flavor p-hero-minimal">
           <div className="hero-min-text">
-            <div className="p-eyebrow">HELLO, I&rsquo;M {(d.name || "").split(" ")[0] || "THERE"}</div>
             <h1>{d.role || "Creator"}</h1>
             <p>{c.heroText}</p>
             <a className="hero-btn primary" href="#p-contact">Resume</a>
@@ -171,7 +167,7 @@ function renderHero(flavor, d, c) {
               <div className="hero-glass-worked">
                 <span>Skills</span>
                 <div className="hero-glass-chip-row">
-                  {d.skills.slice(0, 5).map((s, i) => (
+                  {(d.skills || []).slice(0, 5).map((s, i) => (
                     <span key={i}>{s}</span>
                   ))}
                 </div>
@@ -185,7 +181,6 @@ function renderHero(flavor, d, c) {
       return (
         <div className="p-hero-flavor p-hero-creative">
           <div className="hero-creative-left">
-            <div className="p-eyebrow">HI, I AM</div>
             <h1>{d.name || "Your Name"}</h1>
             <div className="hero-dev-role">{d.role || "Creative"}</div>
           </div>
@@ -200,7 +195,6 @@ function renderHero(flavor, d, c) {
       return (
         <div className="p-hero-flavor p-hero-editorial">
           <div className="hero-ed-mark">{initials(d.name)}</div>
-          <div className="p-eyebrow" style={{ justifyContent: "center", display: "flex" }}>WELCOME TO MY SITE</div>
           <h1>
             Hi, I&rsquo;m {(d.name || "").split(" ")[0] || "there"}, a{" "}
             <span className="hero-ed-accent">{d.role || "creator"}</span>.
@@ -217,7 +211,6 @@ function renderHero(flavor, d, c) {
     default:
       return (
         <div className="p-hero-flavor p-hero-brutalist">
-          <div className="p-eyebrow">{d.name ? d.name.toUpperCase() : "YOUR NAME"} →</div>
           <h1>{d.role || "Builder"}</h1>
           <p>{c.heroText}</p>
           <a className="hero-btn primary brutal" href="#p-projects">Let&rsquo;s get started →</a>
@@ -267,50 +260,54 @@ export default function FinalPortfolio() {
     "--p-font": theme.font,
   };
 
-  const slugBase = slugify(d.name);
+  const slugBase = useMemo(() => slugify(d.name), [d.name]);
 
-  function publish() {
+  const publish = useCallback(() => {
     const rand = Math.floor(1000 + Math.random() * 9000);
     dispatch({ type: "PUBLISH", slug: `${slugBase}-${rand}` });
     dispatch({ type: "GO_TO", page: "published" });
-  }
+  }, [dispatch, slugBase]);
 
-  const mergedProjects = (c.projectDescriptions || []).map((p, i) => {
-    const raw = d.projects[i] || {};
-    return {
-      title: p.title,
-      description: p.description,
-      techStack: p.techStack,
-      image: raw.image || "",
-      link: normalizeUrl(raw.link || ""),
-    };
-  });
+  const mergedProjects = useMemo(() => {
+    return (c.projectDescriptions || []).map((p, i) => {
+      const raw = d.projects?.[i] || {};
+      return {
+        title: p.title,
+        description: p.description,
+        techStack: p.techStack,
+        image: raw.image || "",
+        link: normalizeUrl(raw.link || ""),
+      };
+    });
+  }, [c.projectDescriptions, d.projects]);
 
   const sections = {
     hero: (
-      <div className="p-section" id="p-home" key="hero">
+      <section className="p-section" id="p-home" key="hero">
         {renderHero(flavor, d, c)}
-      </div>
+      </section>
     ),
-    about: (
-      <div className={`p-section p-about ${layout.about}`} id="p-about" key="about">
-        <div
-          className="img-box"
-          style={
-            d.photoUrl
-              ? { backgroundImage: `url(${d.photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
-              : undefined
-          }
-        />
+    about: c.aboutMe ? (
+      <section className={`p-section p-about ${layout.about}`} id="p-about" key="about">
+        <div className="img-box" style={{ overflow: "hidden" }}>
+          {d.photoUrl && (
+            <img 
+              src={d.photoUrl} 
+              alt="About me" 
+              loading="lazy" 
+              style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} 
+            />
+          )}
+        </div>
         <div>
-          <div className="p-eyebrow">ABOUT</div>
+          <h2>About</h2>
           <p>{c.aboutMe}</p>
         </div>
-      </div>
-    ),
+      </section>
+    ) : null,
     projects: (
-      <div className="p-section" id="p-projects" key="projects">
-        <div className="p-eyebrow">PROJECTS</div>
+      <section className="p-section" id="p-projects" key="projects">
+        <h2>Projects</h2>
         <div className={`p-projects ${layout.projects}`}>
           {mergedProjects.length ? (
             mergedProjects.map((p, i) => {
@@ -320,14 +317,20 @@ export default function FinalPortfolio() {
                 : {};
               return (
                 <CardTag className="p-proj" key={i} {...cardProps}>
-                  <div
-                    className={`p-proj-img ${!p.image ? "empty" : ""}`}
-                    style={p.image ? { backgroundImage: `url(${p.image})` } : undefined}
-                  >
-                    {!p.image && <span>{initials(p.title || "Project")}</span>}
+                  <div className={`p-proj-img ${!p.image ? "empty" : ""}`} style={{ overflow: "hidden" }}>
+                    {p.image ? (
+                      <img 
+                        src={p.image} 
+                        alt={p.title || "Project preview"} 
+                        loading="lazy" 
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} 
+                      />
+                    ) : (
+                      <span>{initials(p.title || "Project")}</span>
+                    )}
                   </div>
                   <div className="p-proj-body">
-                    <h4>{p.title}</h4>
+                    <h3>{p.title}</h3>
                     <p>{p.description}</p>
                     {p.techStack?.length > 0 && (
                       <div className="chips">
@@ -346,15 +349,15 @@ export default function FinalPortfolio() {
               );
             })
           ) : (
-            <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No projects yet.</p>
+            <p style={{ color: "var(--p-muted)", fontSize: "1rem" }}>No projects yet.</p>
           )}
         </div>
-      </div>
+      </section>
     ),
-    skills: (
-      <div className="p-section" id="p-skills" key="skills">
-        <div className="p-eyebrow">SKILLS</div>
-        <p style={{ color: "var(--p-muted)", fontSize: 13.5, maxWidth: 560, marginBottom: 22 }}>
+    skills: (d.skills && d.skills.length > 0) ? (
+      <section className="p-section" id="p-skills" key="skills">
+        <h2>Skills</h2>
+        <p style={{ color: "var(--p-muted)", fontSize: "1rem", maxWidth: "65ch", marginBottom: "1.5rem", lineHeight: 1.6 }}>
           {c.skillsDescription}
         </p>
         {layout.skills === "cards" && (
@@ -364,52 +367,25 @@ export default function FinalPortfolio() {
             ))}
           </div>
         )}
-        {layout.skills === "bars" && (
-          <div className="p-skills bars">
-            {d.skills.map((s, i) => (
-              <div className="bar-row" key={i}>
-                <div className="lbl">{s}</div>
-                <div className="bar-track">
-                  <div className="bar-fill" style={{ width: `${60 + ((i * 13) % 35)}%` }} />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        {layout.skills === "tags" && (
+        {["bars", "tags", "percent"].includes(layout.skills) && (
           <div className="p-skills tags">
             {d.skills.map((s, i) => (
               <span key={i}>{s}</span>
             ))}
           </div>
         )}
-        {layout.skills === "percent" && (
-          <div className="p-skills percent">
-            {d.skills.map((s, i) => {
-              const pct = pctFor(s, i);
-              return (
-                <div className="sk-percent" key={i}>
-                  <div className="ring" style={{ "--pct": pct }}>
-                    <span>{pct}%</span>
-                  </div>
-                  <div className="lbl">{s}</div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    ),
+      </section>
+    ) : null,
     contact: (
-      <div className="p-contact" id="p-contact" key="contact">
-        <div className="p-eyebrow" style={{ justifyContent: "center", display: "flex" }}>GET IN TOUCH</div>
+      <section className="p-contact" id="p-contact" key="contact">
+        <h2 style={{ textAlign: "center", marginBottom: "1.5rem" }}>Get in Touch</h2>
         <div className="links">
           {d.email && <a href={`mailto:${d.email}`}>{d.email}</a>}
           {d.github && <a href={normalizeUrl(d.github)} target="_blank" rel="noopener noreferrer">{d.github}</a>}
           {d.linkedin && <a href={normalizeUrl(d.linkedin)} target="_blank" rel="noopener noreferrer">{d.linkedin}</a>}
         </div>
         <FooterSocials d={d} />
-      </div>
+      </section>
     ),
   };
 

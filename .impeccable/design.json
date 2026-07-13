@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-13T14:39:00Z",
+  "title": "Design System: BLUEPRINT",
+  "extensions": {
+    "colorMeta": {
+      "navy-deep":       { "role": "neutral",   "displayName": "Blueprint Navy",       "canonical": "#0A1628", "tonalRamp": ["#020509","#050c18","#0a1628","#0f2137","#142b45","#1e3a5f","#2e5580","#5b84b1"] },
+      "amber":           { "role": "primary",   "displayName": "Amber Signal",          "canonical": "#F2A65A", "tonalRamp": ["#5c3a12","#7d4f1a","#a66524","#c97c35","#f2a65a","#f5bc80","#f8d0a5","#fce5cc"] },
+      "teal":            { "role": "secondary", "displayName": "Blueprint Teal",        "canonical": "#5EEAD4", "tonalRamp": ["#0d3d35","#125445","#1a7a65","#279b82","#5eead4","#8ef0e0","#b5f5ec","#d6faf4"] },
+      "muted-blue":      { "role": "neutral",   "displayName": "Muted Blue",            "canonical": "#8CA3C2", "tonalRamp": ["#1a2b3e","#243858","#2e4870","#3e618f","#5e83b0","#8ca3c2","#b8cce0","#dce8f2"] },
+      "ink-light":       { "role": "neutral",   "displayName": "Blueprint White",       "canonical": "#EAF2FB", "tonalRamp": ["#4a6075","#637a8f","#7d95aa","#96afc0","#b3c8da","#cedef0","#dfeaf7","#eaf2fb"] },
+      "danger":          { "role": "tertiary",  "displayName": "Danger Red",            "canonical": "#F2735A", "tonalRamp": ["#5c1a0f","#7a2315","#a03020","#c04030","#f2735a","#f59585","#f8b5a8","#fcd8d2"] },
+      "warm-paper":      { "role": "neutral",   "displayName": "Warm Paper",            "canonical": "#F6F1E7", "tonalRamp": ["#5c5448","#7a7060","#9e9278","#c0b090","#d8c9aa","#ece0c7","#f4eedd","#f6f1e7"] },
+      "terracotta":      { "role": "primary",   "displayName": "Terracotta Ink",        "canonical": "#C1571F", "tonalRamp": ["#4a1808","#6a2210","#8a3015","#a8401c","#c1571f","#d67a45","#e8a577","#f5ceae"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display / Hero",  "purpose": "Hero headings only. Space Grotesk 600 at large clamp scales." },
+      "headline": { "displayName": "Headline",        "purpose": "Section titles, modal headings." },
+      "title":    { "displayName": "Title",           "purpose": "Card titles, form step names, template labels." },
+      "body":     { "displayName": "Body",            "purpose": "Prose, AI-generated content, form descriptions. Inter for max legibility." },
+      "label":    { "displayName": "Mono Label",      "purpose": "All structural chrome: stage labels, field names, coordinates. JetBrains Mono uppercase." }
+    },
+    "shadows": [
+      { "name": "ambient-deep",  "value": "0 20px 60px rgba(0,0,0,.45)",  "purpose": "Portfolio frame only — the output document sitting on the workbench. One per page." },
+      { "name": "hover-glow",   "value": "0 10px 24px color-mix(in srgb, var(--ink) 35%, transparent)", "purpose": "Primary button hover state. Chromatic lift, not a structural shadow." },
+      { "name": "focus-ring",   "value": "0 0 0 3px color-mix(in srgb, var(--ink) 25%, transparent)", "purpose": "Active stage dots, interactive focus states." },
+      { "name": "light-ambient", "value": "0 20px 50px rgba(80,60,20,.12)", "purpose": "Portfolio frame in light mode." }
+    ],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(.22,.9,.31,1)", "purpose": "All state transitions — fast out, no bounce. System default." },
+      { "name": "duration-fast",  "value": "200ms",  "purpose": "Hover transitions, border-color shifts, opacity." },
+      { "name": "duration-mid",   "value": "300ms",  "purpose": "Theme toggle knob, stage dot state changes." },
+      { "name": "duration-page",  "value": "500ms",  "purpose": "Page fadeUp entrance animation." }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "720px", "purpose": "Single column layout; stage labels hide; grid switches to 1-col." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main CTA. Amber fill, navy text, 3px radius. Never rounded beyond this.",
+      "html": "<button class=\"ds-btn-primary\">DRAFT PORTFOLIO</button>",
+      "css": ".ds-btn-primary { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; padding: 13px 26px; border-radius: 3px; border: 1.5px solid #F2A65A; background: #F2A65A; color: #0A1628; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.2s cubic-bezier(.22,.9,.31,1), box-shadow 0.2s cubic-bezier(.22,.9,.31,1); } .ds-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(242,166,90,0.35); } .ds-btn-primary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(242,166,90,0.25); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary CTA. Transparent bg, shifts border+text to amber on hover. Never fills on hover.",
+      "html": "<button class=\"ds-btn-ghost\">VIEW EXAMPLE</button>",
+      "css": ".ds-btn-ghost { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 14px; padding: 13px 26px; border-radius: 3px; border: 1.5px solid #2E5580; background: transparent; color: #EAF2FB; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: border-color 0.2s, color 0.2s; } .ds-btn-ghost:hover { border-color: #F2A65A; color: #F2A65A; } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(242,166,90,0.25); }"
+    },
+    {
+      "name": "Text Input",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Standard form field. Elevated navy surface, 1px border, shifts to amber on focus.",
+      "html": "<div class=\"ds-field-group\"><label class=\"ds-label\">FULL NAME</label><input class=\"ds-input\" type=\"text\" placeholder=\"Alex Rivera\" /></div>",
+      "css": ".ds-field-group { display: flex; flex-direction: column; gap: 8px; } .ds-label { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.05em; color: #8CA3C2; text-transform: uppercase; } .ds-input { width: 100%; background: #0F2137; border: 1px solid #1E3A5F; border-radius: 3px; padding: 12px 14px; color: #EAF2FB; font-family: 'Inter', sans-serif; font-size: 14px; transition: border-color 0.2s; } .ds-input:focus { outline: none; border-color: #F2A65A; } .ds-input::placeholder { color: #8CA3C2; }"
+    },
+    {
+      "name": "Tag Chip",
+      "kind": "chip",
+      "refersTo": "chip-tag",
+      "description": "Skill/tech tag pill. 14px radius — pill exception to 3px system rule.",
+      "html": "<span class=\"ds-chip\">React <button class=\"ds-chip-rm\">×</button></span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 6px; background: #142B45; border: 1px solid #2E5580; padding: 5px 10px; border-radius: 14px; font-family: 'Inter', sans-serif; font-size: 12px; color: #EAF2FB; } .ds-chip-rm { background: none; border: none; color: #8CA3C2; font-size: 13px; line-height: 1; cursor: pointer; padding: 0; } .ds-chip-rm:hover { color: #F2735A; }"
+    },
+    {
+      "name": "Elevated Card",
+      "kind": "card",
+      "refersTo": "button-primary",
+      "description": "Standard elevated card surface. Tonal lift from bg, 1px border, 6px radius. No shadow at rest.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-label\">01</div><h4 class=\"ds-card-title\">Fill in your details</h4><p class=\"ds-card-body\">Name, role, skills, and projects. 5 steps, 5 minutes.</p></div>",
+      "css": ".ds-card { background: #0F2137; border: 1px solid #1E3A5F; border-radius: 6px; padding: 22px 24px; position: relative; } .ds-card-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #8CA3C2; } .ds-card-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 16px; color: #EAF2FB; margin: 8px 0 6px; } .ds-card-body { font-family: 'Inter', sans-serif; font-size: 13px; color: #8CA3C2; line-height: 1.6; }"
+    },
+    {
+      "name": "Mono Eyebrow",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Section eyebrow: mono label with amber left-rule. Used deliberately — not on every section.",
+      "html": "<div class=\"ds-eyebrow\">AI GENERATION</div>",
+      "css": ".ds-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: #F2A65A; display: flex; align-items: center; gap: 8px; margin-bottom: 16px; } .ds-eyebrow::before { content: ''; width: 16px; height: 1px; background: #F2A65A; }"
+    },
+    {
+      "name": "Stage Dot",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Progress indicator dot. Three states: active (amber + ring), done (teal), upcoming (border-strong).",
+      "html": "<div class=\"ds-stage\"><div class=\"ds-dot ds-dot--done\"></div><div class=\"ds-line\"></div><div class=\"ds-dot ds-dot--active\"></div><div class=\"ds-line\"></div><div class=\"ds-dot\"></div></div>",
+      "css": ".ds-stage { display: flex; align-items: center; gap: 6px; } .ds-dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid #2E5580; background: transparent; transition: all 0.3s cubic-bezier(.22,.9,.31,1); } .ds-dot--done { background: #5EEAD4; border-color: #5EEAD4; } .ds-dot--active { background: #F2A65A; border-color: #F2A65A; box-shadow: 0 0 0 3px rgba(242,166,90,0.25); } .ds-line { width: 26px; height: 1px; background: #2E5580; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Architect's Workbench",
+    "overview": "BLUEPRINT's visual system is what a precision drafting table would look like as software: dark, structured, technical — but inhabited. The navy-deep background reads like drafting paper in a darkened studio; the amber accent is the glow of the desk lamp falling across a schematic. Every element earns its place because drafting tools are built for focus, not decoration.\n\nThe system is committed to contrast as craft. The dark-mode base (#0A1628) is not 'dark because tools look cool dark' — it's because junior developers are already living in dark terminals, dark editors, dark IDEs. BLUEPRINT speaks their ambient language.\n\nThis system explicitly rejects: generic SaaS portfolio builders, enterprise overbuilt tools, and the visual grammar of AI-slop generators — cream backgrounds, gradient text, glassmorphism-as-default, identical card grids, eyebrow labels on every section.",
+    "keyCharacteristics": [
+      "Dark navy base with amber accent; teal as secondary signal color (completion, success)",
+      "Monospace type (JetBrains Mono) for all labels, metadata, and structural chrome",
+      "Sharp corners (border-radius: 3px) as the system default; curves only for pills and circles",
+      "Grid backdrop and crop-mark decoration — structural, not decorative",
+      "Motion: cubic-bezier(.22,.9,.31,1) — fast out, no bounce; state changes only at rest"
+    ],
+    "rules": [
+      { "name": "The Amber Rarity Rule", "body": "Amber (#F2A65A) appears on ≤15% of any given screen. CTAs, active states, focus outlines, eyebrow lines. When everything is amber, nothing is amber.", "section": "colors" },
+      { "name": "The Muted Gray Ceiling", "body": "Muted text (#8CA3C2) is for metadata labels and supporting copy only. Never use it for body prose or any text the user needs to read to complete a task.", "section": "colors" },
+      { "name": "The Mono-as-Chrome Rule", "body": "JetBrains Mono is reserved for the interface talking about itself — stage labels, field names, coordinate metadata, machine states. Running body copy is always Inter.", "section": "typography" },
+      { "name": "The Display Ceiling Rule", "body": "No heading exceeds clamp(38px, 6vw, 68px). Letter-spacing floor at -0.02em for display. Anything tighter than -0.04em makes letters touch and reads as cramped.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Cards, panels, and elevated surfaces use tonal color shifts (--bg-elev) to indicate layering. Shadows appear only when an element genuinely floats above the page in the user's mental model.", "section": "elevation" },
+      { "name": "The No-Nested-Cards Rule", "body": "Cards do not contain cards. When a card surface needs to hold sub-items, use dashed borders or divider lines.", "section": "elevation" },
+      { "name": "The Grid-As-Context Rule", "body": "The blueprint grid and crop marks appear only on the app shell (the drafting table). They must be absent from the generated portfolio frame.", "section": "components" },
+      { "name": "The Ghost Transition Rule", "body": "Ghost buttons only shift border and text color to amber on hover — never fill the background. A ghost button that fills has become a primary button mid-interaction, which is incoherent.", "section": "components" },
+      { "name": "The Two-Surface Rule", "body": "BLUEPRINT has two architecturally separate design surfaces: the app shell (tokens: --bg, --ink, --text, --border, --muted) and the output frame (.portfolio-frame, tokens: --p-bg, --p-surface, --p-text, --p-muted, --p-accent, --p-font). A rule in .portfolio-frame or any .tmpl-* selector is output-layer code. Never use a skin rule as evidence that a pattern is acceptable in the app shell.", "section": "components" }
+    ],
+    "dos": [
+      "Do use JetBrains Mono for all structural labels, field names, stage indicators, and machine-state text.",
+      "Do keep amber (#F2A65A) rare — CTAs, active states, eyebrow lines.",
+      "Do use 3px radius as the default for all interactive controls.",
+      "Do use tonal elevation (color shift from --bg to --bg-elev to --bg-elev-2) rather than shadows to show depth.",
+      "Do keep the blueprint grid and crop-mark decoration only on the app shell.",
+      "Do treat .tmpl-* CSS as output-layer code — if a skin rule appears to violate a DESIGN.md rule, check the selector first; if it's scoped to .tmpl-*, it's a documented exception, not a bug.",
+      "Do keep .portfolio-frame as a single-root DOM element that is never an ancestor of app shell chrome.",
+      "Do verify that muted blue text (#8CA3C2) is only used for metadata labels, not body prose.",
+      "Do use text-wrap: balance on display headings to prevent orphaned words."
+    ],
+    "donts": [
+      "Don't use gradient text (background-clip: text with linear-gradient). Never.",
+      "Don't use glassmorphism (backdrop-filter: blur + translucent fill) on cards, list items, or callouts in the app shell. The .tmpl-glass skin uses it legitimately inside .portfolio-frame — that is a documented exception, not a precedent.",
+      "Don't add new .tmpl-* selectors that apply outside .portfolio-frame. The scope guard depends on this containment.",
+      "Don't use border-left or border-right wider than 1px as a colored accent stripe on cards or list items.",
+      "Don't use border-radius greater than 16px on cards or section containers.",
+      "Don't pair border: 1px solid X with box-shadow blur ≥ 16px on the same element (the ghost-card pattern).",
+      "Don't use cream, sand, beige, or warm-neutral body backgrounds as defaults.",
+      "Don't apply eyebrow labels to every section — one deliberate eyebrow per surface, not a scaffold on every heading.",
+      "Don't design the app shell to look like a generic SaaS product builder (Wix, Squarespace, Canva).",
+      "Don't use sketchy SVG illustrations or feTurbulence paper-grain filters.",
+      "Don't use repeating-linear-gradient stripe backgrounds or decorative two-axis CSS grid overlays."
+    ]
+  }
+}
