@@ -1,9 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { usePortfolioState, usePortfolioDispatch } from "@/context/PortfolioContext";
-import { TEMPLATES } from "@/lib/templates";
-import { generateLayoutFromPrompt } from "@/lib/mockAI";
 
 function initials(name) {
   return (name || "?")
@@ -12,16 +9,6 @@ function initials(name) {
     .slice(0, 2)
     .map((w) => w[0].toUpperCase())
     .join("");
-}
-
-function slugify(name) {
-  return (
-    (name || "draft")
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "") || "draft"
-  );
 }
 
 function pctFor(skill, i) {
@@ -56,7 +43,6 @@ function SocialRow({ d, light }) {
   );
 }
 
-/* ---- Minimal, generic (non-brand-logo) icon set for footer ---- */
 const IconMail = () => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
     <rect x="3" y="5" width="18" height="14" rx="2" />
@@ -79,6 +65,24 @@ const IconFacebook = () => (
     <path d="M15 8h-2a2 2 0 0 0-2 2v2H9v3h2v6h3v-6h2.2l.8-3H14v-1.5c0-.6.3-1 1-1h1.5V8Z" />
   </svg>
 );
+const IconMonitor = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <rect x="3" y="4" width="18" height="12" rx="2" />
+    <path d="M8 20h8M12 16v4" />
+  </svg>
+);
+const IconPhone = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <rect x="7" y="2" width="10" height="20" rx="2" />
+    <path d="M11 18h2" />
+  </svg>
+);
+const IconCloud = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <path d="M7 18a4 4 0 0 1-.5-7.97A5 5 0 0 1 16 8a4.5 4.5 0 0 1 1 8.9" />
+  </svg>
+);
+const SERVICE_ICONS = [IconMonitor, IconPhone, IconCloud];
 
 function FooterSocials({ d }) {
   const items = [
@@ -93,7 +97,7 @@ function FooterSocials({ d }) {
   return (
     <div className="p-footer-socials">
       {items.map((it, i) => (
-        <a
+      <a      
           key={i}
           href={it.href}
           target={it.label === "Email" ? undefined : "_blank"}
@@ -105,6 +109,34 @@ function FooterSocials({ d }) {
         </a>
       ))}
     </div>
+  );
+}
+
+function GlassContactForm() {
+  const [sent, setSent] = useState(false);
+  function handleSubmit(e) {
+    e.preventDefault();
+    setSent(true);
+    setTimeout(() => setSent(false), 2500);
+  }
+  return (
+    <form className="glass-contact-form" onSubmit={handleSubmit}>
+      <div className="gcf-field">
+        <label>Name</label>
+        <input type="text" placeholder="Your name" required />
+      </div>
+      <div className="gcf-field">
+        <label>Email</label>
+        <input type="email" placeholder="you@example.com" required />
+      </div>
+      <div className="gcf-field">
+        <label>Message</label>
+        <textarea placeholder="Tell me about your project" rows={3} required />
+      </div>
+      <button type="submit" className="hero-btn primary">
+        {sent ? "Sent ✓" : "Submit"}
+      </button>
+    </form>
   );
 }
 
@@ -162,22 +194,27 @@ function renderHero(flavor, d, c) {
 
     case "glass":
       return (
-        <div className="p-hero-flavor p-hero-glass">
-          <div className="hero-glass-card">
-            <Photo d={d} className="glass" />
-            <h1>{d.name || "Your Name"}</h1>
-            <p>{c.heroText}</p>
-            <a className="hero-btn primary" href="#p-projects">Let&rsquo;s get started →</a>
-            {skillsCount > 0 && (
-              <div className="hero-glass-worked">
-                <span>Skills</span>
-                <div className="hero-glass-chip-row">
-                  {d.skills.slice(0, 5).map((s, i) => (
-                    <span key={i}>{s}</span>
-                  ))}
-                </div>
-              </div>
-            )}
+        <div className="p-hero-flavor p-hero-glassref">
+          <div className="hero-glassref-left">
+            <div className="hero-glassref-hello">
+              Hello<span className="dot">.</span>
+            </div>
+            <div className="hero-glassref-im">
+              <span className="rule" />
+              <span>I&rsquo;m {(d.name || "").split(" ")[0] || "there"}</span>
+            </div>
+            <h1>{d.role || "Software Developer"}</h1>
+            <div className="hero-cta-row">
+              <a className="hero-btn primary" href="#p-contact">Got a project?</a>
+              <a className="hero-btn ghost" href="#p-about">My resume</a>
+            </div>
+          </div>
+          <div className="hero-glassref-right">
+            <span className="hero-glassref-arrow left">‹</span>
+            <div className="hero-glassref-photo">
+              <Photo d={d} className="glassref" />
+            </div>
+            <span className="hero-glassref-arrow right">›</span>
           </div>
         </div>
       );
@@ -231,32 +268,9 @@ function renderHero(flavor, d, c) {
   }
 }
 
-export default function FinalPortfolio() {
-  const state = usePortfolioState();
-  const dispatch = usePortfolioDispatch();
-  const d = state.data;
-  const c = state.content;
-
-  if (!c) {
-    return (
-      <div className="wrap">
-        <p style={{ color: "var(--muted)" }}>Nothing to preview yet — go back and fill out the form.</p>
-      </div>
-    );
-  }
-
-  let layout, extraClass, flavor;
-  if (state.mode === "template") {
-    const t = TEMPLATES.find((t) => t.id === state.selectedTemplate) || TEMPLATES[0];
-    layout = t.layout;
-    extraClass = t.cls;
-    flavor = t.flavor;
-  } else {
-    layout = state.layoutJson || generateLayoutFromPrompt("minimal");
-    extraClass = "tmpl-ailayout";
-    flavor = "editorial";
-  }
-
+// d = data, c = content, layout = { hero, about, projects, skills, order, theme }, flavor = template flavor id, frameClass = tmpl-* class
+export default function PortfolioRenderer({ d, c, layout, flavor, frameClass }) {
+  const isGlass = flavor === "glass";
   const order = layout.order || DEFAULT_ORDER;
   const theme = layout.theme;
   const frameStyle = {
@@ -267,14 +281,6 @@ export default function FinalPortfolio() {
     "--p-accent": theme.accentColor,
     "--p-font": theme.font,
   };
-
-  const slugBase = slugify(d.name);
-
-  function publish() {
-    const rand = Math.floor(1000 + Math.random() * 9000);
-    dispatch({ type: "PUBLISH", slug: `${slugBase}-${rand}` });
-    dispatch({ type: "GO_TO", page: "published" });
-  }
 
   const mergedProjects = (c.projectDescriptions || []).map((p, i) => {
     const raw = d.projects[i] || {};
@@ -293,7 +299,46 @@ export default function FinalPortfolio() {
         {renderHero(flavor, d, c)}
       </div>
     ),
-    about: (
+
+    about: isGlass ? (
+      <div className="p-section p-about-glassref" id="p-about" key="about">
+        <div className="p-eyebrow">ABOUT</div>
+        <div className="glassref-about-grid">
+          <div className="glassref-services">
+            {d.services?.length ? (
+              d.services.map((s, i) => {
+                const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
+                return (
+                  <div className="glassref-service-item" key={i}>
+                    <span className="gsi-icon"><Icon /></span>
+                    <span>{s.title || "Service"}</span>
+                  </div>
+                );
+              })
+            ) : (
+              <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No services added yet.</p>
+            )}
+          </div>
+          <div className="glassref-about-text">
+            <h3>About me</h3>
+            <p>{c.aboutMe}</p>
+            {(d.stats?.projects || d.stats?.satisfaction || d.stats?.years) && (
+              <div className="glassref-stats-row">
+                {d.stats?.projects && (
+                  <div className="glassref-stat"><b>{d.stats.projects}</b><span>Completed Projects</span></div>
+                )}
+                {d.stats?.satisfaction && (
+                  <div className="glassref-stat"><b>{d.stats.satisfaction}</b><span>Client satisfaction</span></div>
+                )}
+                {d.stats?.years && (
+                  <div className="glassref-stat"><b>{d.stats.years}</b><span>Years of experience</span></div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    ) : (
       <div className={`p-section p-about ${layout.about}`} id="p-about" key="about">
         <div
           className="img-box"
@@ -309,27 +354,23 @@ export default function FinalPortfolio() {
         </div>
       </div>
     ),
+
     projects: (
       <div className="p-section" id="p-projects" key="projects">
         <div className="p-eyebrow">PROJECTS</div>
-        <div className={`p-projects ${layout.projects}`}>
-          {mergedProjects.length ? (
-            mergedProjects.map((p, i) => {
-              const CardTag = p.link ? "a" : "div";
-              const cardProps = p.link
-                ? { href: p.link, target: "_blank", rel: "noopener noreferrer" }
-                : {};
-              return (
-                <CardTag className="p-proj" key={i} {...cardProps}>
+        {layout.projects === "rows" ? (
+          <div className="p-projects-rows">
+            {mergedProjects.length ? (
+              mergedProjects.map((p, i) => (
+                <div className={`p-proj-row ${i % 2 === 1 ? "reverse" : ""}`} key={i}>
                   <div
-                    className={`p-proj-img ${!p.image ? "empty" : ""}`}
+                    className={`p-proj-row-media ${!p.image ? "empty" : ""}`}
                     style={p.image ? { backgroundImage: `url(${p.image})` } : undefined}
                   >
                     {!p.image && <span>{initials(p.title || "Project")}</span>}
                   </div>
-                  <div className="p-proj-body">
+                  <div className="p-proj-row-body">
                     <h4>{p.title}</h4>
-                    <p>{p.description}</p>
                     {p.techStack?.length > 0 && (
                       <div className="chips">
                         {p.techStack.map((t, ti) => (
@@ -337,27 +378,77 @@ export default function FinalPortfolio() {
                         ))}
                       </div>
                     )}
-                    {p.link && (
-                      <span className="p-proj-link mono">
-                        View live <span className="arrow">→</span>
-                      </span>
-                    )}
+                    <p>{p.description}</p>
+                    <div className="p-proj-row-actions">
+                      {d.github && (
+                        <a href={normalizeUrl(d.github)} target="_blank" rel="noopener noreferrer" className="hero-btn primary small">
+                          View Github
+                        </a>
+                      )}
+                      {p.link && (
+                        <a href={p.link} target="_blank" rel="noopener noreferrer" className="p-proj-link mono">
+                          View project <span className="arrow">→</span>
+                        </a>
+                      )}
+                    </div>
                   </div>
-                </CardTag>
-              );
-            })
-          ) : (
-            <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No projects yet.</p>
-          )}
-        </div>
+                </div>
+              ))
+            ) : (
+              <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No projects yet.</p>
+            )}
+          </div>
+        ) : (
+          <div className={`p-projects ${layout.projects}`}>
+            {mergedProjects.length ? (
+              mergedProjects.map((p, i) => {
+                const CardTag = p.link ? "a" : "div";
+                const cardProps = p.link
+                  ? { href: p.link, target: "_blank", rel: "noopener noreferrer" }
+                  : {};
+                return (
+                  <CardTag className="p-proj" key={i} {...cardProps}>
+                    <div
+                      className={`p-proj-img ${!p.image ? "empty" : ""}`}
+                      style={p.image ? { backgroundImage: `url(${p.image})` } : undefined}
+                    >
+                      {!p.image && <span>{initials(p.title || "Project")}</span>}
+                    </div>
+                    <div className="p-proj-body">
+                      <h4>{p.title}</h4>
+                      <p>{p.description}</p>
+                      {p.techStack?.length > 0 && (
+                        <div className="chips">
+                          {p.techStack.map((t, ti) => (
+                            <span key={ti}>{t}</span>
+                          ))}
+                        </div>
+                      )}
+                      {p.link && (
+                        <span className="p-proj-link mono">
+                          View live <span className="arrow">→</span>
+                        </span>
+                      )}
+                    </div>
+                  </CardTag>
+                );
+              })
+            ) : (
+              <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No projects yet.</p>
+            )}
+          </div>
+        )}
       </div>
     ),
+
     skills: (
       <div className="p-section" id="p-skills" key="skills">
-        <div className="p-eyebrow">SKILLS</div>
-        <p style={{ color: "var(--p-muted)", fontSize: 13.5, maxWidth: 560, marginBottom: 22 }}>
-          {c.skillsDescription}
-        </p>
+        {!isGlass && <div className="p-eyebrow">SKILLS</div>}
+        {!isGlass && (
+          <p style={{ color: "var(--p-muted)", fontSize: 13.5, maxWidth: 560, marginBottom: 22 }}>
+            {c.skillsDescription}
+          </p>
+        )}
         {layout.skills === "cards" && (
           <div className="p-skills cards">
             {d.skills.map((s, i) => (
@@ -399,9 +490,27 @@ export default function FinalPortfolio() {
             })}
           </div>
         )}
+        {layout.skills === "strip" && (
+          <div className="p-skills strip">
+            {d.skills.map((s, i) => (
+              <span key={i}>{s}</span>
+            ))}
+          </div>
+        )}
       </div>
     ),
-    contact: (
+
+    contact: isGlass ? (
+      <div className="p-section p-contact-glassref" id="p-contact" key="contact">
+        <div className="p-eyebrow">CONTACTS</div>
+        <div className="glassref-contact-grid">
+          <div className="glassref-contact-heading">
+            <h3>Have a project?<br />Let&rsquo;s talk!</h3>
+          </div>
+          <GlassContactForm />
+        </div>
+      </div>
+    ) : (
       <div className="p-contact" id="p-contact" key="contact">
         <div className="p-eyebrow" style={{ justifyContent: "center", display: "flex" }}>GET IN TOUCH</div>
         <div className="links">
@@ -415,63 +524,44 @@ export default function FinalPortfolio() {
   };
 
   return (
-    <div className="wrap" style={{ maxWidth: 1040 }}>
-      <div className="eyebrow">PHASE 04 — PREVIEW &amp; PUBLISH</div>
-      <div className="portfolio-toolbar">
-        <h2 style={{ fontSize: 24 }}>Your portfolio is ready</h2>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button className="btn ghost small" onClick={() => dispatch({ type: "GO_TO", page: "preview" })}>
-            ← Edit content
-          </button>
-          <button className="btn small" onClick={publish}>Publish &amp; get link →</button>
+    <div className={`portfolio-frame ${frameClass}`} style={frameStyle}>
+      <nav className="p-nav">
+        <div className="p-nav-mark">{initials(d.name)}</div>
+        <div className="p-nav-name">{d.name || "Your Name"}</div>
+        <div className="p-nav-links">
+          <a href="#p-about">About</a>
+          <a href="#p-skills">Skills</a>
+          <a href="#p-projects">Projects</a>
+          <a href="#p-contact">Contact</a>
         </div>
-      </div>
+      </nav>
 
-      <div className="portfolio-frame-outer">
-        <div className="pf-browser-bar">
-          <span></span><span></span><span></span>
-          <div className="pf-browser-url mono">blueprint.site/portfolio/{slugBase}</div>
+      {order.map((key) => sections[key] || null)}
+
+      <footer className="p-footer">
+        <div className="p-footer-top">
+          <div className="p-footer-brand">
+            <div className="p-footer-name">{d.name || "Your Name"}</div>
+            <div className="p-footer-tag">{c.tagline}</div>
+            <FooterSocials d={d} />
+          </div>
+          <div className="p-footer-col">
+            <div className="p-footer-heading">Navigation</div>
+            <a href="#p-about">About</a>
+            <a href="#p-skills">Skills</a>
+            <a href="#p-projects">Projects</a>
+          </div>
+          <div className="p-footer-col">
+            <div className="p-footer-heading">Contact</div>
+            {d.email && <a href={`mailto:${d.email}`}>{d.email}</a>}
+            {d.github && <a href={normalizeUrl(d.github)} target="_blank" rel="noopener noreferrer">{d.github}</a>}
+            {d.linkedin && <a href={normalizeUrl(d.linkedin)} target="_blank" rel="noopener noreferrer">{d.linkedin}</a>}
+          </div>
         </div>
-
-        <div className={`portfolio-frame ${extraClass}`} style={frameStyle}>
-          <nav className="p-nav">
-            <div className="p-nav-mark">{initials(d.name)}</div>
-            <div className="p-nav-links">
-              <a href="#p-about">About</a>
-              <a href="#p-skills">Skills</a>
-              <a href="#p-projects">Projects</a>
-              <a href="#p-contact">Contact</a>
-            </div>
-          </nav>
-
-          {order.map((key) => sections[key] || null)}
-
-          <footer className="p-footer">
-            <div className="p-footer-top">
-              <div className="p-footer-brand">
-                <div className="p-footer-name">{d.name || "Your Name"}</div>
-                <div className="p-footer-tag">{c.tagline}</div>
-                <FooterSocials d={d} />
-              </div>
-              <div className="p-footer-col">
-                <div className="p-footer-heading">Navigation</div>
-                <a href="#p-about">About</a>
-                <a href="#p-skills">Skills</a>
-                <a href="#p-projects">Projects</a>
-              </div>
-              <div className="p-footer-col">
-                <div className="p-footer-heading">Contact</div>
-                {d.email && <a href={`mailto:${d.email}`}>{d.email}</a>}
-                {d.github && <a href={normalizeUrl(d.github)} target="_blank" rel="noopener noreferrer">{d.github}</a>}
-                {d.linkedin && <a href={normalizeUrl(d.linkedin)} target="_blank" rel="noopener noreferrer">{d.linkedin}</a>}
-              </div>
-            </div>
-            <div className="p-footer-bottom">
-              © {new Date().getFullYear()} {d.name || "Your Name"} — built with Blueprint
-            </div>
-          </footer>
+        <div className="p-footer-bottom">
+          © {new Date().getFullYear()} {d.name || "Your Name"} — built with Blueprint
         </div>
-      </div>
+      </footer>
     </div>
   );
 }

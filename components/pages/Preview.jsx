@@ -1,6 +1,7 @@
 "use client";
 
 import { usePortfolioState, usePortfolioDispatch } from "@/context/PortfolioContext";
+import BackButton from "@/components/BackButton";
 
 export default function Preview() {
   const state = usePortfolioState();
@@ -10,6 +11,9 @@ export default function Preview() {
   if (!c) {
     return (
       <div className="wrap">
+        <div className="page-back-row">
+          <BackButton label="← Back to form" />
+        </div>
         <p style={{ color: "var(--muted)" }}>No draft yet — go back and fill out the form.</p>
       </div>
     );
@@ -21,6 +25,9 @@ export default function Preview() {
 
   return (
     <div className="wrap" style={{ maxWidth: 760 }}>
+      <div className="page-back-row">
+        <BackButton label="← Back to form" />
+      </div>
       <div className="eyebrow">PHASE 02 — REVIEW &amp; EDIT</div>
       <h2 style={{ fontSize: 28, marginBottom: 8 }}>Your AI-generated draft</h2>
       <p style={{ color: "var(--muted)", fontSize: 14, marginBottom: 34 }}>

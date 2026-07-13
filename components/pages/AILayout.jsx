@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { usePortfolioState, usePortfolioDispatch } from "@/context/PortfolioContext";
+import BackButton from "@/components/BackButton";
 import { generateLayoutFromPrompt } from "@/lib/mockAI";
 
 const QUICK_STYLES = [
@@ -42,6 +43,9 @@ export default function AILayout() {
 
   return (
     <div className="wrap" style={{ maxWidth: 700 }}>
+      <div className="page-back-row">
+        <BackButton label="← Back to content" />
+      </div>
       <div className="eyebrow">PHASE 03B — AI LAYOUT</div>
       <h2 style={{ fontSize: 28 }}>Describe a style</h2>
       <p style={{ color: "var(--muted)", fontSize: 14, marginTop: 8 }}>
@@ -106,9 +110,7 @@ export default function AILayout() {
       )}
 
       <div className="form-nav">
-        <button className="btn ghost small" onClick={() => dispatch({ type: "GO_TO", page: "preview" })}>
-          ← Back to content
-        </button>
+        <BackButton label="← Back to content" />
         <button className="btn small" disabled={!layout} onClick={build}>
           Build portfolio →
         </button>

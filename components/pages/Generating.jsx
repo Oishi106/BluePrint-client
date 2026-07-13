@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { usePortfolioState, usePortfolioDispatch } from "@/context/PortfolioContext";
+import BackButton from "@/components/BackButton";
 import { generateContent as generateContentMock } from "@/lib/mockAI";
 import { generateAIContent, createPortfolio } from "@/lib/api";
 
@@ -74,6 +75,9 @@ export default function Generating() {
 
   return (
     <div className="gen-wrap">
+      <div className="page-back-row" style={{ position: "absolute", top: 24, left: 24 }}>
+        <BackButton label="← Back to form" />
+      </div>
       <div className="gen-ring">
         <svg viewBox="0 0 64 64">
           <circle cx="32" cy="32" r="26" fill="none" stroke="var(--border)" strokeWidth="3" />

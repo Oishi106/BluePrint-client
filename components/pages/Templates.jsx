@@ -1,6 +1,7 @@
 "use client";
 
 import { usePortfolioState, usePortfolioDispatch } from "@/context/PortfolioContext";
+import BackButton from "@/components/BackButton";
 import { TEMPLATES, suggestTemplate } from "@/lib/templates";
 
 function Thumb({ t }) {
@@ -81,6 +82,9 @@ export default function Templates() {
 
   return (
     <div className="wrap">
+      <div className="page-back-row">
+        <BackButton label="← Back to content" />
+      </div>
       <div className="eyebrow">PHASE 03A — TEMPLATE</div>
       <h2 className="headline">Pick a template</h2>
       <p className="body" style={{ color: "var(--muted)" }}>
@@ -113,9 +117,7 @@ export default function Templates() {
       </div>
 
       <div className="form-nav">
-        <button className="btn ghost small" onClick={() => dispatch({ type: "GO_TO", page: "preview" })}>
-          ← Back to content
-        </button>
+        <BackButton label="← Back to content" />
         <button className="btn small" disabled={!state.selectedTemplate} onClick={build}>
           Build portfolio →
         </button>

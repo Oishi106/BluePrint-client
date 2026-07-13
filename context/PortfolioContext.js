@@ -2,9 +2,10 @@
 
 import { createContext, useContext, useReducer } from "react";
 import { generateContent } from "@/lib/mockAI";
+import { clearPersistedState } from "@/lib/navigation";
 
 const initialState = {
-  page: "landing", // landing | form | generating | preview | templates | ailayout | final | published
+  page: "landing",
   theme: "dark",
   data: {
     name: "",
@@ -15,18 +16,19 @@ const initialState = {
     skills: [],
     projects: [],
     education: [],
+    services: [],
+    stats: { projects: "", satisfaction: "", years: "" },
     email: "",
     github: "",
     linkedin: "",
     facebook: "",
   },
   content: null,
-  mode: null, // 'template' | 'ai-layout'
+  mode: null,
   selectedTemplate: null,
   layoutJson: null,
   published: false,
   slug: "",
-  
   portfolioId: null,
 };
 
@@ -34,6 +36,23 @@ function reducer(state, action) {
   switch (action.type) {
     case "GO_TO":
       return { ...state, page: action.page };
+
+    case "RESTORE": {
+      const p = action.payload || {};
+      return {
+        ...state,
+        page: p.page ?? state.page,
+        theme: p.theme ?? state.theme,
+        data: p.data ? { ...state.data, ...p.data, photoFile: null } : state.data,
+        content: p.content ?? state.content,
+        mode: p.mode ?? state.mode,
+        selectedTemplate: p.selectedTemplate ?? state.selectedTemplate,
+        layoutJson: p.layoutJson ?? state.layoutJson,
+        published: p.published ?? state.published,
+        slug: p.slug ?? state.slug,
+        portfolioId: p.portfolioId ?? state.portfolioId,
+      };
+    }
 
     case "TOGGLE_THEME":
       return { ...state, theme: state.theme === "dark" ? "light" : "dark" };
@@ -53,7 +72,7 @@ function reducer(state, action) {
     case "ADD_PROJECT":
       return {
         ...state,
-        data: { ...state.data, projects: [...state.data.projects, { name: "", description: "", tech: "", link: "", image: ""  }] },
+        data: { ...state.data, projects: [...state.data.projects, { name: "", description: "", tech: "", link: "", image: "" }] },
       };
 
     case "UPDATE_PROJECT": {
@@ -86,10 +105,28 @@ function reducer(state, action) {
       return { ...state, data: { ...state.data, education } };
     }
 
+    case "ADD_SERVICE":
+      return { ...state, data: { ...state.data, services: [...state.data.services, { title: "" }] } };
+
+    case "UPDATE_SERVICE": {
+      const services = state.data.services.map((s, i) =>
+        i === action.index ? { ...s, title: action.value } : s
+      );
+      return { ...state, data: { ...state.data, services } };
+    }
+
+    case "REMOVE_SERVICE": {
+      const services = state.data.services.filter((_, i) => i !== action.index);
+      return { ...state, data: { ...state.data, services } };
+    }
+
+    case "SET_STAT":
+      return { ...state, data: { ...state.data, stats: { ...state.data.stats, [action.field]: action.value } } };
+
     case "SET_CONTENT":
       return { ...state, content: action.content };
 
-      case "SET_PORTFOLIO_ID":
+    case "SET_PORTFOLIO_ID":
       return { ...state, portfolioId: action.id };
 
     case "UPDATE_CONTENT_FIELD":
@@ -123,6 +160,7 @@ function reducer(state, action) {
       return { ...state, published: true, slug: action.slug };
 
     case "RESET":
+      clearPersistedState();
       return { ...initialState, theme: state.theme };
 
     default:
@@ -153,4 +191,3 @@ export function usePortfolioDispatch() {
   if (!ctx) throw new Error("usePortfolioDispatch must be used inside PortfolioProvider");
   return ctx;
 }
-
