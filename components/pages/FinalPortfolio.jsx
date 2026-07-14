@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { useState, useEffect } from "react";
 import { usePortfolioState, usePortfolioDispatch } from "@/context/PortfolioContext";
 import { TEMPLATES } from "@/lib/templates";
 import { generateLayoutFromPrompt } from "@/lib/mockAI";
@@ -56,7 +57,7 @@ function SocialRow({ d, light }) {
   );
 }
 
-/* ---- Minimal, generic (non-brand-logo) icon set for footer ---- */
+/* ---- Inline icon set (no external icon package installed) ---- */
 const IconMail = () => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
     <rect x="3" y="5" width="18" height="14" rx="2" />
@@ -79,6 +80,66 @@ const IconFacebook = () => (
     <path d="M15 8h-2a2 2 0 0 0-2 2v2H9v3h2v6h3v-6h2.2l.8-3H14v-1.5c0-.6.3-1 1-1h1.5V8Z" />
   </svg>
 );
+const IconMonitor = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <rect x="3" y="4" width="18" height="12" rx="2" />
+    <path d="M8 20h8M12 16v4" />
+  </svg>
+);
+const IconPhone = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <rect x="7" y="2" width="10" height="20" rx="2" />
+    <path d="M11 18h2" />
+  </svg>
+);
+const IconCloud = () => (
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6">
+    <path d="M7 18a4 4 0 0 1-.5-7.97A5 5 0 0 1 16 8a4.5 4.5 0 0 1 1 8.9" />
+  </svg>
+);
+const SERVICE_ICONS = [IconMonitor, IconPhone, IconCloud];
+
+const IconArrowDown = () => (
+  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <path d="M12 4v16M5 13l7 7 7-7" />
+  </svg>
+);
+const IconDownload = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <path d="M12 3v12m0 0l-4-4m4 4l4-4M4 19h16" />
+  </svg>
+);
+const IconSparkles = () => (
+  <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+    <path d="M12 2l1.6 5.4L19 9l-5.4 1.6L12 16l-1.6-5.4L5 9l5.4-1.6L12 2Z" />
+  </svg>
+);
+const IconGraduationCap = () => (
+  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <path d="M22 10L12 5 2 10l10 5 10-5Z" />
+    <path d="M6 12v5c0 1.5 3 3 6 3s6-1.5 6-3v-5" />
+  </svg>
+);
+const IconHeart = () => (
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <path d="M12 21s-7-4.5-9.3-9C1 8.5 2.5 4.5 6.5 4.2 8.8 4 11 5.2 12 7c1-1.8 3.2-3 5.5-2.8 4 .3 5.5 4.3 3.8 7.8-2.3 4.5-9.3 9-9.3 9Z" />
+  </svg>
+);
+const IconExternalLink = () => (
+  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <path d="M14 4h6v6M20 4l-9 9M20 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h4" />
+  </svg>
+);
+const IconSend = () => (
+  <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <path d="M22 2 11 13M22 2 15 22l-4-9-9-4 20-7Z" />
+  </svg>
+);
+const IconCheck = () => (
+  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M20 6 9 17l-5-5" />
+  </svg>
+);
 
 function FooterSocials({ d }) {
   const items = [
@@ -93,7 +154,7 @@ function FooterSocials({ d }) {
   return (
     <div className="p-footer-socials">
       {items.map((it, i) => (
-        <a
+        <a  
           key={i}
           href={it.href}
           target={it.label === "Email" ? undefined : "_blank"}
@@ -108,37 +169,390 @@ function FooterSocials({ d }) {
   );
 }
 
+function GlassContactForm() {
+  const [sent, setSent] = useState(false);
+  function handleSubmit(e) {
+    e.preventDefault();
+    setSent(true);
+    setTimeout(() => setSent(false), 2500);
+  }
+  return (
+    <form className="glass-contact-form" onSubmit={handleSubmit}>
+      <div className="gcf-field">
+        <label>Name</label>
+        <input type="text" placeholder="Your name" required />
+      </div>
+      <div className="gcf-field">
+        <label>Email</label>
+        <input type="email" placeholder="you@example.com" required />
+      </div>
+      <div className="gcf-field">
+        <label>Message</label>
+        <textarea placeholder="Tell me about your project" rows={3} required />
+      </div>
+      <button type="submit" className="hero-btn primary">
+        {sent ? "Sent ✓" : "Submit"}
+      </button>
+    </form>
+  );
+}
+
+/* ================= AlexDev flavor (Developer / Terminal Green) ================= */
+
+function useTypedRole(words) {
+  const [index, setIndex] = useState(0);
+  const [text, setText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    if (!words.length) return;
+    const current = words[index % words.length];
+    const speed = deleting ? 40 : 80;
+    const timeout = setTimeout(() => {
+      if (!deleting) {
+        const next = current.slice(0, text.length + 1);
+        setText(next);
+        if (next === current) setTimeout(() => setDeleting(true), 1300);
+      } else {
+        const next = current.slice(0, text.length - 1);
+        setText(next);
+        if (next === "") {
+          setDeleting(false);
+          setIndex((i) => (i + 1) % words.length);
+        }
+      }
+    }, speed);
+    return () => clearTimeout(timeout);
+  }, [text, deleting, index, words]);
+
+  return text;
+}
+
+function AlexDevHero({ d, c }) {
+  const roles = [d.role, ...d.skills.slice(0, 3)].filter(Boolean);
+  const typed = useTypedRole(roles.length ? roles : ["Developer"]);
+
+  const socials = [
+    d.github && { href: normalizeUrl(d.github), label: "GitHub", Icon: IconGithub },
+    d.linkedin && { href: normalizeUrl(d.linkedin), label: "LinkedIn", Icon: IconLinkedin },
+    d.facebook && { href: normalizeUrl(d.facebook), label: "Facebook", Icon: IconFacebook },
+    d.email && { href: `mailto:${d.email}`, label: "Email", Icon: IconMail },
+  ].filter(Boolean);
+
+  return (
+    <div className="alexdev-hero">
+      <div className="alexdev-hero-glow a" />
+      <div className="alexdev-hero-glow b" />
+      <div className="alexdev-hero-grid">
+        <div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}
+            className="alexdev-glass alexdev-badge"
+          >
+            <IconSparkles /> Available for freelance &amp; full-time roles
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.05 }}
+            className="alexdev-h1"
+          >
+            Hi, I&rsquo;m <span className="alexdev-gradient-text">{d.name || "Your Name"}</span>
+            <br />
+            <span className="alexdev-muted-line">I build the web,</span>
+            <br />
+            beautifully.
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.15 }}
+            className="alexdev-lead"
+          >
+            I&rsquo;m a{" "}
+            <span className="alexdev-typed">
+              {typed}
+              <span className="alexdev-caret" />
+            </span>{" "}
+            {c.heroText}
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.25 }}
+            className="alexdev-cta-row"
+          >
+            <a href="#p-contact" className="alexdev-btn primary">Hire Me</a>
+            <a href="#p-about" className="alexdev-btn glass"><IconDownload /> My Resume</a>
+          </motion.div>
+
+          {socials.length > 0 && (
+            <motion.ul
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, delay: 0.35 }}
+              className="alexdev-social-row"
+            >
+              {socials.map(({ href, label, Icon }) => (
+                <li key={label}>
+                  <a href={href} target={label === "Email" ? undefined : "_blank"} rel="noopener noreferrer" aria-label={label} className="alexdev-social-btn">
+                    <Icon />
+                  </a>
+                </li>
+              ))}
+            </motion.ul>
+          )}
+        </div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.8, delay: 0.1 }}
+          className="alexdev-portrait-wrap"
+        >
+          <div className="alexdev-portrait-glow" />
+          <div className="alexdev-portrait-card">
+            {d.photoUrl ? (
+              <img src={d.photoUrl} alt={d.name || "Portrait"} />
+            ) : (
+              <div className="alexdev-portrait-empty">{initials(d.name)}</div>
+            )}
+          </div>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="alexdev-glass alexdev-float-badge bl">
+            <div className="fb-label">Currently</div>
+            <div className="fb-value">Building something new ✨</div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }} className="alexdev-glass alexdev-float-badge tr">
+            <div className="fb-label">Response time</div>
+            <div className="fb-value">&lt; 24 hours</div>
+          </motion.div>
+        </motion.div>
+      </div>
+
+      <motion.a
+        href="#p-about" aria-label="Scroll to about"
+        initial={{ opacity: 0 }} animate={{ opacity: 1, y: [0, 8, 0] }}
+        transition={{ opacity: { delay: 1 }, y: { duration: 2, repeat: Infinity } }}
+        className="alexdev-scroll-hint"
+      >
+        <IconArrowDown />
+      </motion.a>
+    </div>
+  );
+}
+
+function AlexDevAbout({ d, c }) {
+  const stats = [
+    { label: "Projects Shipped", value: d.stats?.projects || `${d.projects.length}+` },
+    { label: "Years Experience", value: d.stats?.years || "—" },
+    { label: "Technologies", value: `${d.skills.length}+` },
+    { label: "Client Satisfaction", value: d.stats?.satisfaction || "—" },
+  ];
+  const timeline = d.education.map((ed) => ({
+    title: ed.degree || "Degree",
+    org: ed.institution || "Institution",
+    period: ed.year || "",
+  }));
+  const interests = d.skills.slice(0, 6);
+
+  return (
+    <>
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6 }} className="alexdev-section-intro">
+        <p className="alexdev-eyebrow">About</p>
+        <h2 className="alexdev-h2">A developer who cares about <span className="alexdev-gradient-text">craft</span>.</h2>
+        <p className="alexdev-body">{c.aboutMe}</p>
+      </motion.div>
+
+      <motion.ul
+        initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }}
+        variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
+        className="alexdev-stats-grid"
+      >
+        {stats.map((s) => (
+          <motion.li key={s.label} variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }} className="alexdev-glass alexdev-stat-card">
+            <div className="alexdev-stat-value alexdev-gradient-text">{s.value}</div>
+            <div className="alexdev-stat-label">{s.label}</div>
+          </motion.li>
+        ))}
+      </motion.ul>
+
+      <div className="alexdev-about-cols">
+        <div>
+          <h3 className="alexdev-h3">Experience &amp; Education</h3>
+          {timeline.length ? (
+            <ol className="alexdev-timeline">
+              {timeline.map((item, i) => (
+                <motion.li key={i} initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.5, delay: i * 0.1 }}>
+                  <span className="alexdev-timeline-dot"><IconGraduationCap /></span>
+                  <div className="alexdev-glass alexdev-timeline-card">
+                    <div className="alexdev-timeline-head">
+                      <h4>{item.title}</h4>
+                      <span>{item.period}</span>
+                    </div>
+                    <p className="alexdev-timeline-org">{item.org}</p>
+                  </div>
+                </motion.li>
+              ))}
+            </ol>
+          ) : (
+            <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No education added yet.</p>
+          )}
+        </div>
+
+        {interests.length > 0 && (
+          <motion.aside initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6 }} className="alexdev-glass alexdev-interests">
+            <h3><IconHeart /> Focus areas</h3>
+            <p>The skills I reach for most often.</p>
+            <ul>
+              {interests.map((i) => (<li key={i}>{i}</li>))}
+            </ul>
+          </motion.aside>
+        )}
+      </div>
+    </>
+  );
+}
+
+function AlexDevSkills({ d, c }) {
+  return (
+    <>
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6 }} className="alexdev-section-intro">
+        <p className="alexdev-eyebrow">Skills</p>
+        <h2 className="alexdev-h2">Tools I use to <span className="alexdev-gradient-text">ship</span>.</h2>
+        <p className="alexdev-body">{c.skillsDescription}</p>
+      </motion.div>
+      <ul className="alexdev-skills-grid">
+        {d.skills.map((s, i) => {
+          const pct = pctFor(s, i);
+          return (
+            <motion.li key={s} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.04 }} className="alexdev-skill-card">
+              <div className="alexdev-skill-top">
+                <span className="alexdev-skill-dot" />
+                <span>{s}</span>
+              </div>
+              <div className="alexdev-skill-track">
+                <motion.div initial={{ width: 0 }} whileInView={{ width: `${pct}%` }} viewport={{ once: true }} transition={{ duration: 1, delay: 0.1 + i * 0.04 }} className="alexdev-skill-fill" />
+              </div>
+              <div className="alexdev-skill-pct">{pct}%</div>
+            </motion.li>
+          );
+        })}
+      </ul>
+    </>
+  );
+}
+
+function AlexDevProjects({ mergedProjects, d }) {
+  return (
+    <>
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6 }} className="alexdev-projects-head">
+        <div>
+          <p className="alexdev-eyebrow">Projects</p>
+          <h2 className="alexdev-h2">Selected <span className="alexdev-gradient-text">work</span>.</h2>
+        </div>
+        {d.github && (
+          <a href={normalizeUrl(d.github)} target="_blank" rel="noopener noreferrer" className="alexdev-btn glass small">
+            <IconGithub /> View all on GitHub
+          </a>
+        )}
+      </motion.div>
+      <ul className="alexdev-projects-grid">
+        {mergedProjects.length ? mergedProjects.map((p, i) => (
+          <motion.li key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.5, delay: i * 0.06 }} className="alexdev-glass alexdev-proj-card">
+            <div className={`alexdev-proj-media ${!p.image ? "empty" : ""}`} style={p.image ? { backgroundImage: `url(${p.image})` } : undefined}>
+              {!p.image && <span>{initials(p.title)}</span>}
+            </div>
+            <div className="alexdev-proj-body">
+              <h4>{p.title}</h4>
+              <p>{p.description}</p>
+              {p.techStack?.length > 0 && (
+                <ul className="alexdev-proj-chips">
+                  {p.techStack.map((t, ti) => <li key={ti}>{t}</li>)}
+                </ul>
+              )}
+              <div className="alexdev-proj-actions">
+                {p.link && <a href={p.link} target="_blank" rel="noopener noreferrer" className="alexdev-btn primary small"><IconExternalLink /> Live Demo</a>}
+                {d.github && <a href={normalizeUrl(d.github)} target="_blank" rel="noopener noreferrer" className="alexdev-btn glass small"><IconGithub /> GitHub</a>}
+              </div>
+            </div>
+          </motion.li>
+        )) : <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No projects yet.</p>}
+      </ul>
+    </>
+  );
+}
+
+function AlexDevContact({ d }) {
+  const [sent, setSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  function onSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setSent(true);
+      e.target.reset();
+      setTimeout(() => setSent(false), 3500);
+    }, 900);
+  }
+
+  const info = [
+    d.email && { Icon: IconMail, label: "Email", value: d.email, href: `mailto:${d.email}` },
+    d.github && { Icon: IconGithub, label: "GitHub", value: d.github, href: normalizeUrl(d.github) },
+    d.linkedin && { Icon: IconLinkedin, label: "LinkedIn", value: d.linkedin, href: normalizeUrl(d.linkedin) },
+  ].filter(Boolean);
+
+  return (
+    <>
+      <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6 }} className="alexdev-section-intro">
+        <p className="alexdev-eyebrow">Contact</p>
+        <h2 className="alexdev-h2">Let&rsquo;s build something <span className="alexdev-gradient-text">great</span>.</h2>
+      </motion.div>
+      <div className="alexdev-contact-grid">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.6 }} className="alexdev-glass alexdev-contact-info">
+          <h3>Get in touch</h3>
+          <p>Prefer email? Any of these channels work — I usually reply within a day.</p>
+          <ul>
+            {info.map(({ Icon, label, value, href }) => (
+              <li key={label}>
+                <a href={href} target={label === "Email" ? undefined : "_blank"} rel="noopener noreferrer">
+                  <span className="alexdev-contact-icon"><Icon /></span>
+                  <div>
+                    <div className="ci-label">{label}</div>
+                    <div className="ci-value">{value}</div>
+                  </div>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+
+        <motion.form onSubmit={onSubmit} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.6, delay: 0.1 }} className="alexdev-glass alexdev-contact-form">
+          <div className="alexdev-form-row">
+            <div className="alexdev-field"><label>Name</label><input type="text" placeholder="Your full name" required /></div>
+            <div className="alexdev-field"><label>Email</label><input type="email" placeholder="you@email.com" required /></div>
+          </div>
+          <div className="alexdev-field"><label>Subject</label><input type="text" placeholder="What's this about?" required /></div>
+          <div className="alexdev-field"><label>Message</label><textarea rows={5} placeholder="Tell me a little about your project..." required /></div>
+          <button type="submit" disabled={loading || sent} className="alexdev-btn primary">
+            {loading ? "Sending..." : sent ? (<><IconCheck /> Sent</>) : (<><IconSend /> Send Message</>)}
+          </button>
+          <AnimatePresence>
+            {sent && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="alexdev-sent-note">
+                <IconCheck /> Thanks — your message has been sent.
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.form>
+      </div>
+    </>
+  );
+}
+
+/* ================= end AlexDev flavor ================= */
+
 function renderHero(flavor, d, c) {
   const skillsCount = d.skills.length;
   const projectsCount = d.projects.length;
 
   switch (flavor) {
-    case "developer":
-      return (
-        <div className="p-hero-flavor p-hero-developer">
-          <div>
-            <div className="p-eyebrow">HI, I AM</div>
-            <h1>{d.name || "Your Name"}</h1>
-            <div className="hero-dev-role">{d.role || "Developer"}</div>
-            <p className="hero-dev-text">{c.heroText}</p>
-            <div className="hero-cta-row">
-              <a className="hero-btn primary" href="#p-projects">View Work</a>
-              <a className="hero-btn ghost" href="#p-contact">Get in Touch</a>
-            </div>
-            <SocialRow d={d} />
-            <div className="hero-stats-row">
-              <div className="hero-stat"><b>{skillsCount}+</b><span>Skills</span></div>
-              <div className="hero-stat"><b>{projectsCount}+</b><span>Projects</span></div>
-              <div className="hero-stat"><b>{d.education?.length || 0}</b><span>Education</span></div>
-            </div>
-          </div>
-          <div className="hero-dev-right">
-            <div className="hero-photo-glow">
-              <Photo d={d} className="dev" />
-            </div>
-          </div>
-        </div>
-      );
+    case "alexdev":
+      return <AlexDevHero d={d} c={c} />;
 
     case "minimal":
       return (
@@ -257,6 +671,8 @@ export default function FinalPortfolio() {
     flavor = "editorial";
   }
 
+  const isGlass = flavor === "glass";
+  const isAlexDev = flavor === "alexdev";
   const order = layout.order || DEFAULT_ORDER;
   const theme = layout.theme;
   const frameStyle = {
@@ -265,15 +681,34 @@ export default function FinalPortfolio() {
     "--p-text": theme.mode === "dark" ? "#EAF2FB" : "#241F16",
     "--p-muted": theme.mode === "dark" ? "#8CA3C2" : "#8B8270",
     "--p-accent": theme.accentColor,
+    "--p-accent-2": theme.accentColor2 || theme.accentColor,
     "--p-font": theme.font,
   };
 
   const slugBase = slugify(d.name);
+  const previewUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/portfolio/${slugBase}`;
 
-  function publish() {
-    const rand = Math.floor(1000 + Math.random() * 9000);
-    dispatch({ type: "PUBLISH", slug: `${slugBase}-${rand}` });
-    dispatch({ type: "GO_TO", page: "published" });
+  async function publish() {
+    if (!state.portfolioId) {
+      setErrorMsg("No saved draft found — go back a step so it can be saved first.");
+      return;
+    }
+    setPublishing(true);
+    setErrorMsg("");
+    try {
+      const res = await publishPortfolio(state.portfolioId, slugBase, {
+        mode: state.mode,
+        selectedTemplate: state.selectedTemplate,
+        layoutJson: state.layoutJson,
+      });
+      dispatch({ type: "PUBLISH", slug: res.slug });
+      dispatch({ type: "GO_TO", page: "published" });
+    } catch (err) {
+      console.error("Publish failed:", err);
+      setErrorMsg("Couldn't publish — check the server is running and try again.");
+    } finally {
+      setPublishing(false);
+    }
   }
 
   const mergedProjects = (c.projectDescriptions || []).map((p, i) => {
@@ -289,11 +724,54 @@ export default function FinalPortfolio() {
 
   const sections = {
     hero: (
-      <div className="p-section" id="p-home" key="hero">
+      <div className={`p-section ${isAlexDev ? "alexdev-hero-section" : ""}`} id="p-home" key="hero">
         {renderHero(flavor, d, c)}
       </div>
     ),
-    about: (
+
+    about: isAlexDev ? (
+      <div className="p-section" id="p-about" key="about">
+        <AlexDevAbout d={d} c={c} />
+      </div>
+    ) : isGlass ? (
+      <div className="p-section p-about-glassref" id="p-about" key="about">
+        <div className="p-eyebrow">ABOUT</div>
+        <div className="glassref-about-grid">
+          <div className="glassref-services">
+            {d.services?.length ? (
+              d.services.map((s, i) => {
+                const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
+                return (
+                  <div className="glassref-service-item" key={i}>
+                    <span className="gsi-icon"><Icon /></span>
+                    <span>{s.title || "Service"}</span>
+                  </div>
+                );
+              })
+            ) : (
+              <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No services added yet.</p>
+            )}
+          </div>
+          <div className="glassref-about-text">
+            <h3>About me</h3>
+            <p>{c.aboutMe}</p>
+            {(d.stats?.projects || d.stats?.satisfaction || d.stats?.years) && (
+              <div className="glassref-stats-row">
+                {d.stats?.projects && (
+                  <div className="glassref-stat"><b>{d.stats.projects}</b><span>Completed Projects</span></div>
+                )}
+                {d.stats?.satisfaction && (
+                  <div className="glassref-stat"><b>{d.stats.satisfaction}</b><span>Client satisfaction</span></div>
+                )}
+                {d.stats?.years && (
+                  <div className="glassref-stat"><b>{d.stats.years}</b><span>Years of experience</span></div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    ) : (
       <div className={`p-section p-about ${layout.about}`} id="p-about" key="about">
         <div
           className="img-box"
@@ -309,7 +787,12 @@ export default function FinalPortfolio() {
         </div>
       </div>
     ),
-    projects: (
+
+    projects: isAlexDev ? (
+      <div className="p-section" id="p-projects" key="projects">
+        <AlexDevProjects mergedProjects={mergedProjects} d={d} />
+      </div>
+    ) : (
       <div className="p-section" id="p-projects" key="projects">
         <div className="p-eyebrow">PROJECTS</div>
         <div className={`p-projects ${layout.projects}`}>
@@ -352,7 +835,12 @@ export default function FinalPortfolio() {
         </div>
       </div>
     ),
-    skills: (
+
+    skills: isAlexDev ? (
+      <div className="p-section" id="p-skills" key="skills">
+        <AlexDevSkills d={d} c={c} />
+      </div>
+    ) : (
       <div className="p-section" id="p-skills" key="skills">
         <div className="p-eyebrow">SKILLS</div>
         <p style={{ color: "var(--p-muted)", fontSize: 13.5, maxWidth: 560, marginBottom: 22 }}>
@@ -401,7 +889,22 @@ export default function FinalPortfolio() {
         )}
       </div>
     ),
-    contact: (
+
+    contact: isAlexDev ? (
+      <div className="p-section" id="p-contact" key="contact">
+        <AlexDevContact d={d} />
+      </div>
+    ) : isGlass ? (
+      <div className="p-section p-contact-glassref" id="p-contact" key="contact">
+        <div className="p-eyebrow">CONTACTS</div>
+        <div className="glassref-contact-grid">
+          <div className="glassref-contact-heading">
+            <h3>Have a project?<br />Let&rsquo;s talk!</h3>
+          </div>
+          <GlassContactForm />
+        </div>
+      </div>
+    ) : (
       <div className="p-contact" id="p-contact" key="contact">
         <div className="p-eyebrow" style={{ justifyContent: "center", display: "flex" }}>GET IN TOUCH</div>
         <div className="links">

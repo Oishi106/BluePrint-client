@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "motion/react";
 
 function initials(name) {
   return (name || "?")
@@ -146,31 +147,74 @@ function renderHero(flavor, d, c) {
 
   switch (flavor) {
     case "developer":
-      return (
-        <div className="p-hero-flavor p-hero-developer">
-          <div>
-            <div className="p-eyebrow">HI, I AM</div>
-            <h1>{d.name || "Your Name"}</h1>
-            <div className="hero-dev-role">{d.role || "Developer"}</div>
-            <p className="hero-dev-text">{c.heroText}</p>
-            <div className="hero-cta-row">
-              <a className="hero-btn primary" href="#p-projects">View Work</a>
-              <a className="hero-btn ghost" href="#p-contact">Get in Touch</a>
-            </div>
-            <SocialRow d={d} />
-            <div className="hero-stats-row">
-              <div className="hero-stat"><b>{skillsCount}+</b><span>Skills</span></div>
-              <div className="hero-stat"><b>{projectsCount}+</b><span>Projects</span></div>
-              <div className="hero-stat"><b>{d.education?.length || 0}</b><span>Education</span></div>
-            </div>
-          </div>
-          <div className="hero-dev-right">
-            <div className="hero-photo-glow">
-              <Photo d={d} className="dev" />
-            </div>
-          </div>
+  return (
+    <div className="p-hero-flavor p-hero-devpro">
+      <div className="devpro-badge">
+        <span className="devpro-badge-dot" />
+        Available for freelance &amp; full-time roles
+      </div>
+
+      <motion.h1
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+      >
+        Hi, I&rsquo;m <span className="devpro-gradient">{d.name || "Your Name"}</span>
+        <br />
+        <span className="devpro-muted">{d.role || "Developer"}</span>
+      </motion.h1>
+
+      <motion.p
+        className="hero-dev-text"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
+        {c.heroText}
+      </motion.p>
+
+      <motion.div
+        className="hero-cta-row"
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+      >
+        <a className="hero-btn primary" href="#p-contact">Hire Me</a>
+        <a className="hero-btn ghost" href="#p-projects">View Work</a>
+      </motion.div>
+
+      <SocialRow d={d} />
+
+      <motion.div
+        className="hero-dev-right devpro-photo-wrap"
+        initial={{ opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.7, delay: 0.15 }}
+      >
+        <div className="hero-photo-glow">
+          <Photo d={d} className="dev" />
         </div>
-      );
+        <motion.div
+          className="devpro-float devpro-float-1"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          <div className="devpro-float-label">Skills</div>
+          <div className="devpro-float-value">{skillsCount}+ tools</div>
+        </motion.div>
+        <motion.div
+          className="devpro-float devpro-float-2"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8 }}
+        >
+          <div className="devpro-float-label">Projects</div>
+          <div className="devpro-float-value">{projectsCount}+ shipped</div>
+        </motion.div>
+      </motion.div>
+    </div>
+   );
 
     case "minimal":
       return (
@@ -300,60 +344,7 @@ export default function PortfolioRenderer({ d, c, layout, flavor, frameClass }) 
       </div>
     ),
 
-    about: isGlass ? (
-      <div className="p-section p-about-glassref" id="p-about" key="about">
-        <div className="p-eyebrow">ABOUT</div>
-        <div className="glassref-about-grid">
-          <div className="glassref-services">
-            {d.services?.length ? (
-              d.services.map((s, i) => {
-                const Icon = SERVICE_ICONS[i % SERVICE_ICONS.length];
-                return (
-                  <div className="glassref-service-item" key={i}>
-                    <span className="gsi-icon"><Icon /></span>
-                    <span>{s.title || "Service"}</span>
-                  </div>
-                );
-              })
-            ) : (
-              <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No services added yet.</p>
-            )}
-          </div>
-          <div className="glassref-about-text">
-            <h3>About me</h3>
-            <p>{c.aboutMe}</p>
-            {(d.stats?.projects || d.stats?.satisfaction || d.stats?.years) && (
-              <div className="glassref-stats-row">
-                {d.stats?.projects && (
-                  <div className="glassref-stat"><b>{d.stats.projects}</b><span>Completed Projects</span></div>
-                )}
-                {d.stats?.satisfaction && (
-                  <div className="glassref-stat"><b>{d.stats.satisfaction}</b><span>Client satisfaction</span></div>
-                )}
-                {d.stats?.years && (
-                  <div className="glassref-stat"><b>{d.stats.years}</b><span>Years of experience</span></div>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    ) : (
-      <div className={`p-section p-about ${layout.about}`} id="p-about" key="about">
-        <div
-          className="img-box"
-          style={
-            d.photoUrl
-              ? { backgroundImage: `url(${d.photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
-              : undefined
-          }
-        />
-        <div>
-          <div className="p-eyebrow">ABOUT</div>
-          <p>{c.aboutMe}</p>
-        </div>
-      </div>
-    ),
+   
 
     projects: (
       <div className="p-section" id="p-projects" key="projects">
