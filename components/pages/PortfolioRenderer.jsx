@@ -141,9 +141,9 @@ function GlassContactForm() {
   );
 }
 
-function renderHero(flavor, d, c) {
+function renderHero(flavor, d, c) {                     
   const skillsCount = d.skills.length;
-  const projectsCount = d.projects.length;
+  const projectsCount = d.projects.length;                        
 
   switch (flavor) {
     case "developer":
