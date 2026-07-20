@@ -472,10 +472,10 @@ export default function PortfolioRenderer({ d, c, layout, flavor, frameClass }) 
               const pct = pctFor(s, i);
               return (
                 <div className="sk-percent" key={i}>
-                  <div className="ring" style={{ "--pct": pct }}>
+                  <div className="ring" style={{ "--pct": pct }}>            
                     <span>{pct}%</span>
                   </div>
-                  <div className="lbl">{s}</div>
+                  <div className="lbl">{s}</div>                 
                 </div>
               );
             })}

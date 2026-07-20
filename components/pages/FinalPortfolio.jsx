@@ -5,8 +5,6 @@ import { useState, useEffect } from "react";
 import { usePortfolioState, usePortfolioDispatch } from "@/context/PortfolioContext";
 import { TEMPLATES } from "@/lib/templates";
 import { generateLayoutFromPrompt } from "@/lib/mockAI";
-import { publishPortfolio } from "@/lib/api";
-import BackButton from "@/components/BackButton";
 
 function initials(name) {
   return (name || "?")
@@ -578,27 +576,22 @@ function renderHero(flavor, d, c) {
 
     case "glass":
       return (
-        <div className="p-hero-flavor p-hero-glassref">
-          <div className="hero-glassref-left">
-            <div className="hero-glassref-hello">
-              Hello<span className="dot">.</span>
-            </div>
-            <div className="hero-glassref-im">
-              <span className="rule" />
-              <span>I&rsquo;m {(d.name || "").split(" ")[0] || "there"}</span>
-            </div>
-            <h1>{d.role || "Software Developer"}</h1>
-            <div className="hero-cta-row">
-              <a className="hero-btn primary" href="#p-contact">Got a project?</a>
-              <a className="hero-btn ghost" href="#p-about">My resume</a>
-            </div>
-          </div>
-          <div className="hero-glassref-right">
-            <span className="hero-glassref-arrow left">‹</span>
-            <div className="hero-glassref-photo">
-              <Photo d={d} className="glassref" />
-            </div>
-            <span className="hero-glassref-arrow right">›</span>
+        <div className="p-hero-flavor p-hero-glass">
+          <div className="hero-glass-card">
+            <Photo d={d} className="glass" />
+            <h1>{d.name || "Your Name"}</h1>
+            <p>{c.heroText}</p>
+            <a className="hero-btn primary" href="#p-projects">Let&rsquo;s get started →</a>
+            {skillsCount > 0 && (
+              <div className="hero-glass-worked">
+                <span>Skills</span>
+                <div className="hero-glass-chip-row">
+                  {d.skills.slice(0, 5).map((s, i) => (
+                    <span key={i}>{s}</span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       );
@@ -655,17 +648,12 @@ function renderHero(flavor, d, c) {
 export default function FinalPortfolio() {
   const state = usePortfolioState();
   const dispatch = usePortfolioDispatch();
-  const [publishing, setPublishing] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
   const d = state.data;
   const c = state.content;
 
   if (!c) {
     return (
       <div className="wrap">
-        <div className="page-back-row">
-          <BackButton label="← Back to form" />
-        </div>
         <p style={{ color: "var(--muted)" }}>Nothing to preview yet — go back and fill out the form.</p>
       </div>
     );
@@ -807,19 +795,24 @@ export default function FinalPortfolio() {
     ) : (
       <div className="p-section" id="p-projects" key="projects">
         <div className="p-eyebrow">PROJECTS</div>
-        {layout.projects === "rows" ? (
-          <div className="p-projects-rows">
-            {mergedProjects.length ? (
-              mergedProjects.map((p, i) => (
-                <div className={`p-proj-row ${i % 2 === 1 ? "reverse" : ""}`} key={i}>
+        <div className={`p-projects ${layout.projects}`}>
+          {mergedProjects.length ? (
+            mergedProjects.map((p, i) => {
+              const CardTag = p.link ? "a" : "div";
+              const cardProps = p.link
+                ? { href: p.link, target: "_blank", rel: "noopener noreferrer" }
+                : {};
+              return (
+                <CardTag className="p-proj" key={i} {...cardProps}>
                   <div
-                    className={`p-proj-row-media ${!p.image ? "empty" : ""}`}
+                    className={`p-proj-img ${!p.image ? "empty" : ""}`}
                     style={p.image ? { backgroundImage: `url(${p.image})` } : undefined}
                   >
                     {!p.image && <span>{initials(p.title || "Project")}</span>}
                   </div>
-                  <div className="p-proj-row-body">
+                  <div className="p-proj-body">
                     <h4>{p.title}</h4>
+                    <p>{p.description}</p>
                     {p.techStack?.length > 0 && (
                       <div className="chips">
                         {p.techStack.map((t, ti) => (
@@ -827,66 +820,19 @@ export default function FinalPortfolio() {
                         ))}
                       </div>
                     )}
-                    <p>{p.description}</p>
-                    <div className="p-proj-row-actions">
-                      {d.github && (
-                        <a href={normalizeUrl(d.github)} target="_blank" rel="noopener noreferrer" className="hero-btn primary small">
-                          View Github
-                        </a>
-                      )}
-                      {p.link && (
-                        <a href={p.link} target="_blank" rel="noopener noreferrer" className="p-proj-link mono">
-                          View project <span className="arrow">→</span>
-                        </a>
-                      )}
-                    </div>
+                    {p.link && (
+                      <span className="p-proj-link mono">
+                        View live <span className="arrow">→</span>
+                      </span>
+                    )}
                   </div>
-                </div>
-              ))
-            ) : (
-              <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No projects yet.</p>
-            )}
-          </div>
-        ) : (
-          <div className={`p-projects ${layout.projects}`}>
-            {mergedProjects.length ? (
-              mergedProjects.map((p, i) => {
-                const CardTag = p.link ? "a" : "div";
-                const cardProps = p.link
-                  ? { href: p.link, target: "_blank", rel: "noopener noreferrer" }
-                  : {};
-                return (
-                  <CardTag className="p-proj" key={i} {...cardProps}>
-                    <div
-                      className={`p-proj-img ${!p.image ? "empty" : ""}`}
-                      style={p.image ? { backgroundImage: `url(${p.image})` } : undefined}
-                    >
-                      {!p.image && <span>{initials(p.title || "Project")}</span>}
-                    </div>
-                    <div className="p-proj-body">
-                      <h4>{p.title}</h4>
-                      <p>{p.description}</p>
-                      {p.techStack?.length > 0 && (
-                        <div className="chips">
-                          {p.techStack.map((t, ti) => (
-                            <span key={ti}>{t}</span>
-                          ))}
-                        </div>
-                      )}
-                      {p.link && (
-                        <span className="p-proj-link mono">
-                          View live <span className="arrow">→</span>
-                        </span>
-                      )}
-                    </div>
-                  </CardTag>
-                );
-              })
-            ) : (
-              <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No projects yet.</p>
-            )}
-          </div>
-        )}
+                </CardTag>
+              );
+            })
+          ) : (
+            <p style={{ color: "var(--p-muted)", fontSize: 13 }}>No projects yet.</p>
+          )}
+        </div>
       </div>
     ),
 
@@ -896,12 +842,10 @@ export default function FinalPortfolio() {
       </div>
     ) : (
       <div className="p-section" id="p-skills" key="skills">
-        {!isGlass && <div className="p-eyebrow">SKILLS</div>}
-        {!isGlass && (
-          <p style={{ color: "var(--p-muted)", fontSize: 13.5, maxWidth: 560, marginBottom: 22 }}>
-            {c.skillsDescription}
-          </p>
-        )}
+        <div className="p-eyebrow">SKILLS</div>
+        <p style={{ color: "var(--p-muted)", fontSize: 13.5, maxWidth: 560, marginBottom: 22 }}>
+          {c.skillsDescription}
+        </p>
         {layout.skills === "cards" && (
           <div className="p-skills cards">
             {d.skills.map((s, i) => (
@@ -943,13 +887,6 @@ export default function FinalPortfolio() {
             })}
           </div>
         )}
-        {layout.skills === "strip" && (
-          <div className="p-skills strip">
-            {d.skills.map((s, i) => (
-              <span key={i}>{s}</span>
-            ))}
-          </div>
-        )}
       </div>
     ),
 
@@ -982,9 +919,6 @@ export default function FinalPortfolio() {
 
   return (
     <div className="wrap" style={{ maxWidth: 1040 }}>
-      <div className="page-back-row">
-        <BackButton label={state.mode === "template" ? "← Back to templates" : "← Back to AI layout"} />
-      </div>
       <div className="eyebrow">PHASE 04 — PREVIEW &amp; PUBLISH</div>
       <div className="portfolio-toolbar">
         <h2 style={{ fontSize: 24 }}>Your portfolio is ready</h2>
@@ -992,28 +926,19 @@ export default function FinalPortfolio() {
           <button className="btn ghost small" onClick={() => dispatch({ type: "GO_TO", page: "preview" })}>
             ← Edit content
           </button>
-          <button className="btn small" onClick={publish} disabled={publishing}>
-            {publishing ? "Publishing…" : "Publish & get link →"}
-          </button>
+          <button className="btn small" onClick={publish}>Publish &amp; get link →</button>
         </div>
       </div>
-
-      {errorMsg && (
-        <p style={{ color: "var(--danger)", fontSize: 12.5, fontFamily: "var(--font-mono)", marginBottom: 14 }}>
-          {errorMsg}
-        </p>
-      )}
 
       <div className="portfolio-frame-outer">
         <div className="pf-browser-bar">
           <span></span><span></span><span></span>
-          <div className="pf-browser-url mono">{previewUrl}</div>
+          <div className="pf-browser-url mono">blueprint.site/portfolio/{slugBase}</div>
         </div>
 
         <div className={`portfolio-frame ${extraClass}`} style={frameStyle}>
           <nav className="p-nav">
             <div className="p-nav-mark">{initials(d.name)}</div>
-            <div className="p-nav-name">{d.name || "Your Name"}</div>
             <div className="p-nav-links">
               <a href="#p-about">About</a>
               <a href="#p-skills">Skills</a>
