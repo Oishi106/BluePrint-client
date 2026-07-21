@@ -41,12 +41,12 @@ export default function Published() {
         <button
           className="btn"
           onClick={() => {
-            dispatch({ type: "RESET" });
+            dispatch({ type: "RESET" });          
             dispatch({ type: "GO_TO", page: "landing" });
           }}
         >
           Start a new draft
-        </button>
+        </button>                 
       </div>
     </div>
   );
