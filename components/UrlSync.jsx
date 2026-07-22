@@ -65,7 +65,7 @@ export default function UrlSync() {
     if (state.page === "landing" && !state.content && !state.data.name) {
       clearPersistedState();
     }
-  }, [state.page, state.content, state.data.name]);
+  }, [state.page, state.content, state.data.name]);                       
 
-  return null;
+  return null;                         
 }
