@@ -6,9 +6,9 @@ import { getPreviousPage } from "@/lib/navigation";
 export default function BackButton({ label = "← Back", className = "" }) {
   const state = usePortfolioState();
   const dispatch = usePortfolioDispatch();
-  const prev = getPreviousPage(state.page, state);
+  const prev = getPreviousPage(state.page, state);          
 
-  if (!prev) return null;
+  if (!prev) return null;                                
 
   return (
     <button
