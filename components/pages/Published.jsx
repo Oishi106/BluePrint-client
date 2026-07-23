@@ -47,7 +47,7 @@ export default function Published() {
         >
           Start a new draft
         </button>                 
-      </div>
-    </div>
+      </div>                         
+    </div>                        
   );
 }
