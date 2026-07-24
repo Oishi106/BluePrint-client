@@ -5,6 +5,9 @@ import { useState, useEffect } from "react";
 import { usePortfolioState, usePortfolioDispatch } from "@/context/PortfolioContext";
 import { TEMPLATES } from "@/lib/templates";
 import { generateLayoutFromPrompt } from "@/lib/mockAI";
+import TemplateOne from "@/components/templates/TemplateOne";
+import TemplateTwo from "@/components/templates/TemplateTwo";
+import TemplateThree from "@/components/templates/TemplateThree";
 
 function initials(name) {
   return (name || "?")
@@ -37,6 +40,14 @@ function normalizeUrl(url) {
 }
 
 const DEFAULT_ORDER = ["hero", "about", "skills", "projects", "contact"];
+
+// --- NEW: maps a template's `component` string to the actual React component
+const CUSTOM_COMPONENTS = {
+  TemplateOne,
+  TemplateTwo,
+  TemplateThree,
+};
+// --- END NEW ---
 
 function Photo({ d, className }) {
   return (
@@ -659,6 +670,78 @@ export default function FinalPortfolio() {
     );
   }
 
+  const slugBase = slugify(d.name);
+
+  async function publish() {
+    if (!state.portfolioId) {
+      setErrorMsg("No saved draft found — go back a step so it can be saved first.");
+      return;
+    }
+    setPublishing(true);
+    setErrorMsg("");
+    try {
+      const res = await publishPortfolio(state.portfolioId, slugBase, {
+        mode: state.mode,
+        selectedTemplate: state.selectedTemplate,
+        layoutJson: state.layoutJson,
+      });
+      dispatch({ type: "PUBLISH", slug: res.slug });
+      dispatch({ type: "GO_TO", page: "published" });
+    } catch (err) {
+      console.error("Publish failed:", err);
+      setErrorMsg("Couldn't publish — check the server is running and try again.");
+    } finally {
+      setPublishing(false);
+    }
+  }
+
+  // --- NEW: custom coded templates (TemplateOne/Two/Three) skip the generic flavor renderer entirely ---
+  let customTemplate = null;
+  if (state.mode === "template") {
+    const t = TEMPLATES.find((t) => t.id === state.selectedTemplate) || TEMPLATES[0];
+    if (t.custom) customTemplate = t;
+  }
+
+  if (customTemplate) {
+    const CustomComponent = CUSTOM_COMPONENTS[customTemplate.component];
+    const portfolioData = {
+      ...d,
+      content: c,
+      theme: customTemplate.layout.theme,
+    };
+
+    return (
+      <div className="wrap" style={{ maxWidth: 1040 }}>
+        <div className="eyebrow">PHASE 04 — PREVIEW &amp; PUBLISH</div>
+        <div className="portfolio-toolbar">
+          <h2 style={{ fontSize: 24 }}>Your portfolio is ready</h2>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button className="btn ghost small" onClick={() => dispatch({ type: "GO_TO", page: "preview" })}>
+              ← Edit content
+            </button>
+            <button className="btn small" onClick={publish}>Publish &amp; get link →</button>
+          </div>
+        </div>
+
+        <div className="portfolio-frame-outer">
+          <div className="pf-browser-bar">
+            <span></span><span></span><span></span>
+            <div className="pf-browser-url mono">blueprint.site/portfolio/{slugBase}</div>
+          </div>
+
+          {CustomComponent ? (
+            <CustomComponent data={portfolioData} />
+          ) : (
+            <p style={{ color: "var(--danger)", padding: 24 }}>
+              Unknown template component: {customTemplate.component}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+  // --- END NEW ---
+
   let layout, extraClass, flavor;
   if (state.mode === "template") {
     const t = TEMPLATES.find((t) => t.id === state.selectedTemplate) || TEMPLATES[0];
@@ -685,31 +768,7 @@ export default function FinalPortfolio() {
     "--p-font": theme.font,
   };
 
-  const slugBase = slugify(d.name);
   const previewUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/portfolio/${slugBase}`;
-
-  async function publish() {
-    if (!state.portfolioId) {
-      setErrorMsg("No saved draft found — go back a step so it can be saved first.");
-      return;
-    }
-    setPublishing(true);
-    setErrorMsg("");
-    try {
-      const res = await publishPortfolio(state.portfolioId, slugBase, {
-        mode: state.mode,
-        selectedTemplate: state.selectedTemplate,
-        layoutJson: state.layoutJson,
-      });
-      dispatch({ type: "PUBLISH", slug: res.slug });
-      dispatch({ type: "GO_TO", page: "published" });
-    } catch (err) {
-      console.error("Publish failed:", err);
-      setErrorMsg("Couldn't publish — check the server is running and try again.");
-    } finally {
-      setPublishing(false);
-    }
-  }
 
   const mergedProjects = (c.projectDescriptions || []).map((p, i) => {
     const raw = d.projects[i] || {};

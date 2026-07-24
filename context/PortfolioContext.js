@@ -22,6 +22,10 @@ const initialState = {
     github: "",
     linkedin: "",
     facebook: "",
+    // NEW: optional sections — empty array = section hidden
+    certificates: [],
+    achievements: [],
+    internships: [],
   },
   content: null,
   mode: null,
@@ -119,6 +123,64 @@ function reducer(state, action) {
       const services = state.data.services.filter((_, i) => i !== action.index);
       return { ...state, data: { ...state.data, services } };
     }
+
+    // --- NEW: optional sections — Certificates ---
+    case "ADD_CERTIFICATE":
+      return {
+        ...state,
+        data: { ...state.data, certificates: [...state.data.certificates, { title: "", issuer: "", year: "", link: "", image: "" }] },
+      };
+
+    case "UPDATE_CERTIFICATE": {
+      const certificates = state.data.certificates.map((c, i) =>
+        i === action.index ? { ...c, [action.field]: action.value } : c
+      );
+      return { ...state, data: { ...state.data, certificates } };
+    }
+
+    case "REMOVE_CERTIFICATE": {
+      const certificates = state.data.certificates.filter((_, i) => i !== action.index);
+      return { ...state, data: { ...state.data, certificates } };
+    }
+
+    // --- NEW: optional sections — Achievements ---
+    case "ADD_ACHIEVEMENT":
+      return {
+        ...state,
+        data: { ...state.data, achievements: [...state.data.achievements, { title: "", description: "", year: "" }] },
+      };
+
+    case "UPDATE_ACHIEVEMENT": {
+      const achievements = state.data.achievements.map((a, i) =>
+        i === action.index ? { ...a, [action.field]: action.value } : a
+      );
+      return { ...state, data: { ...state.data, achievements } };
+    }
+
+    case "REMOVE_ACHIEVEMENT": {
+      const achievements = state.data.achievements.filter((_, i) => i !== action.index);
+      return { ...state, data: { ...state.data, achievements } };
+    }
+
+    // --- NEW: optional sections — Internships ---
+    case "ADD_INTERNSHIP":
+      return {
+        ...state,
+        data: { ...state.data, internships: [...state.data.internships, { role: "", company: "", duration: "", description: "" }] },
+      };
+
+    case "UPDATE_INTERNSHIP": {
+      const internships = state.data.internships.map((it, i) =>
+        i === action.index ? { ...it, [action.field]: action.value } : it
+      );
+      return { ...state, data: { ...state.data, internships } };
+    }
+
+    case "REMOVE_INTERNSHIP": {
+      const internships = state.data.internships.filter((_, i) => i !== action.index);
+      return { ...state, data: { ...state.data, internships } };
+    }
+    // --- END NEW ---
 
     case "SET_STAT":
       return { ...state, data: { ...state.data, stats: { ...state.data.stats, [action.field]: action.value } } };

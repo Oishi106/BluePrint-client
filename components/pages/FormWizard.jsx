@@ -41,6 +41,16 @@ function handlePhotoChange(e) {
   reader.readAsDataURL(file);
 }
 
+function handleCertificateImageChange(index, e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    dispatch({ type: "UPDATE_CERTIFICATE", index, field: "image", value: reader.result });
+  };
+  reader.readAsDataURL(file);
+}
+
   function validateStep(s) {
     if (s === 1 && (!d.name.trim() || !d.role.trim())) {
       setErrorFlash("Name and role are required.");
@@ -425,6 +435,247 @@ function handlePhotoChange(e) {
                 onChange={(e) => dispatch({ type: "SET_STAT", field: "years", value: e.target.value })}
               />
             </div>
+
+            {/* NEW: optional — Certificates */}
+            <label
+              style={{
+                display: "block",
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                color: "var(--muted)",
+                textTransform: "uppercase",
+                margin: "30px 0 4px",
+              }}
+            >
+              Certificates
+            </label>
+            <div className="hint" style={{ marginBottom: 16 }}>
+              Optional — skip if you don&apos;t have any yet. Only shown on your portfolio if you add at least one.
+            </div>
+            {d.certificates.map((c, i) => (
+              <div className="repeat-card" key={i}>
+                <button
+                  type="button"
+                  className="rm-btn"
+                  onClick={() => dispatch({ type: "REMOVE_CERTIFICATE", index: i })}
+                >
+                  ×
+                </button>
+
+                <div className="field-group">
+                  <label>Certificate image</label>
+                  <div className="photo-upload-row">
+                    {c.image ? (
+                      <img src={c.image} alt={`${c.title || "Certificate"} preview`} className="photo-preview" />
+                    ) : (
+                      <div className="photo-preview photo-preview-empty">No image</div>
+                    )}
+                    <label className="btn ghost small photo-upload-btn">
+                      {c.image ? "Change image" : "Upload image"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleCertificateImageChange(i, e)}
+                        style={{ display: "none" }}
+                      />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="two-col">
+                  <div className="field-group">
+                    <label>Title</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. AWS Cloud Practitioner"
+                      value={c.title}
+                      onChange={(e) =>
+                        dispatch({ type: "UPDATE_CERTIFICATE", index: i, field: "title", value: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="field-group">
+                    <label>Year</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 2025"
+                      value={c.year}
+                      onChange={(e) =>
+                        dispatch({ type: "UPDATE_CERTIFICATE", index: i, field: "year", value: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="two-col">
+                  <div className="field-group">
+                    <label>Issuer</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Amazon Web Services"
+                      value={c.issuer}
+                      onChange={(e) =>
+                        dispatch({ type: "UPDATE_CERTIFICATE", index: i, field: "issuer", value: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="field-group">
+                    <label>Credential link</label>
+                    <input
+                      type="text"
+                      placeholder="https://…"
+                      value={c.link}
+                      onChange={(e) =>
+                        dispatch({ type: "UPDATE_CERTIFICATE", index: i, field: "link", value: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+            <button type="button" className="add-row-btn" onClick={() => dispatch({ type: "ADD_CERTIFICATE" })}>
+              + Add certificate
+            </button>
+
+            {/* NEW: optional — Achievements */}
+            <label
+              style={{
+                display: "block",
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                color: "var(--muted)",
+                textTransform: "uppercase",
+                margin: "30px 0 4px",
+              }}
+            >
+              Achievements
+            </label>
+            <div className="hint" style={{ marginBottom: 16 }}>
+              Optional — e.g. hackathon wins, competition results, awards.
+            </div>
+            {d.achievements.map((a, i) => (
+              <div className="repeat-card" key={i} style={{ padding: 14 }}>
+                <button
+                  type="button"
+                  className="rm-btn"
+                  onClick={() => dispatch({ type: "REMOVE_ACHIEVEMENT", index: i })}
+                >
+                  ×
+                </button>
+                <div className="two-col">
+                  <div className="field-group">
+                    <label>Title</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 1st Place — University Hackathon"
+                      value={a.title}
+                      onChange={(e) =>
+                        dispatch({ type: "UPDATE_ACHIEVEMENT", index: i, field: "title", value: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="field-group">
+                    <label>Year</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. 2025"
+                      value={a.year}
+                      onChange={(e) =>
+                        dispatch({ type: "UPDATE_ACHIEVEMENT", index: i, field: "year", value: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="field-group">
+                  <label>Description</label>
+                  <textarea
+                    placeholder="A sentence or two about it."
+                    value={a.description}
+                    onChange={(e) =>
+                      dispatch({ type: "UPDATE_ACHIEVEMENT", index: i, field: "description", value: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+            <button type="button" className="add-row-btn" onClick={() => dispatch({ type: "ADD_ACHIEVEMENT" })}>
+              + Add achievement
+            </button>
+
+            {/* NEW: optional — Internships */}
+            <label
+              style={{
+                display: "block",
+                fontFamily: "var(--font-mono)",
+                fontSize: 11,
+                color: "var(--muted)",
+                textTransform: "uppercase",
+                margin: "30px 0 4px",
+              }}
+            >
+              Internships
+            </label>
+            <div className="hint" style={{ marginBottom: 16 }}>
+              Optional — skip if you haven&apos;t interned anywhere yet.
+            </div>
+            {d.internships.map((it, i) => (
+              <div className="repeat-card" key={i}>
+                <button
+                  type="button"
+                  className="rm-btn"
+                  onClick={() => dispatch({ type: "REMOVE_INTERNSHIP", index: i })}
+                >
+                  ×
+                </button>
+                <div className="two-col">
+                  <div className="field-group">
+                    <label>Role</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Frontend Intern"
+                      value={it.role}
+                      onChange={(e) =>
+                        dispatch({ type: "UPDATE_INTERNSHIP", index: i, field: "role", value: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="field-group">
+                    <label>Duration</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Jun 2025 – Aug 2025"
+                      value={it.duration}
+                      onChange={(e) =>
+                        dispatch({ type: "UPDATE_INTERNSHIP", index: i, field: "duration", value: e.target.value })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="field-group">
+                  <label>Company</label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Pathao"
+                    value={it.company}
+                    onChange={(e) =>
+                      dispatch({ type: "UPDATE_INTERNSHIP", index: i, field: "company", value: e.target.value })
+                    }
+                  />
+                </div>
+                <div className="field-group">
+                  <label>Description</label>
+                  <textarea
+                    placeholder="What did you work on?"
+                    value={it.description}
+                    onChange={(e) =>
+                      dispatch({ type: "UPDATE_INTERNSHIP", index: i, field: "description", value: e.target.value })
+                    }
+                  />
+                </div>
+              </div>
+            ))}
+            <button type="button" className="add-row-btn" onClick={() => dispatch({ type: "ADD_INTERNSHIP" })}>
+              + Add internship
+            </button>
           </div>
         )}
 
@@ -488,8 +739,3 @@ function handlePhotoChange(e) {
     </div>
   );
 }
-
-
-
-
-
