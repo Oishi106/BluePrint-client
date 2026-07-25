@@ -1027,8 +1027,8 @@ export default function TemplateThree({ data }) {
 
       <Hero d={d} c={c} />
       <Stats d={d} />
-      <About d={d} c={c} />       
-      <Skills d={d} c={c} />          
+      <About d={d} c={c} />                 
+      <Skills d={d} c={c} />                        
       <Projects mergedProjects={mergedProjects} d={d} />
       <Certificates d={d} />
       <TimelineSection d={d} />
