@@ -1045,6 +1045,6 @@ export default function TemplateThree({ data }) {
         .portfolio-frame.tmpl-glass .t3-section { position: relative; padding: 96px 0; }
         .portfolio-frame.tmpl-glass button { font-family: inherit; }
       `}</style>
-    </div>
+    </div>    
   );
 }
