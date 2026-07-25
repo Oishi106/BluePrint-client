@@ -1035,7 +1035,7 @@ export default function TemplateThree({ data }) {
       <Contact d={d} />            
 
       <T3Footer d={d} c={c} />          
-      <ScrollToTop />           
+      <ScrollToTop />                               
 
       <style jsx>{`
         .t3-section :global(.t3-container) { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
