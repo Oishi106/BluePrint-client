@@ -1034,7 +1034,7 @@ export default function TemplateThree({ data }) {
       <TimelineSection d={d} />
       <Contact d={d} />            
 
-      <T3Footer d={d} c={c} />
+      <T3Footer d={d} c={c} />          
       <ScrollToTop />           
 
       <style jsx>{`
