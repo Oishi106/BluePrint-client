@@ -1032,7 +1032,7 @@ export default function TemplateThree({ data }) {
       <Projects mergedProjects={mergedProjects} d={d} />
       <Certificates d={d} />
       <TimelineSection d={d} />
-      <Contact d={d} />
+      <Contact d={d} />            
 
       <T3Footer d={d} c={c} />
       <ScrollToTop />           
