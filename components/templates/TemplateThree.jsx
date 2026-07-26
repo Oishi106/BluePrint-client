@@ -1031,11 +1031,11 @@ export default function TemplateThree({ data }) {
       <Skills d={d} c={c} />                        
       <Projects mergedProjects={mergedProjects} d={d} />
       <Certificates d={d} />
-      <TimelineSection d={d} />
+      <TimelineSection d={d} />                    
       <Contact d={d} />            
 
-      <T3Footer d={d} c={c} />          
-      <ScrollToTop />                               
+      <T3Footer d={d} c={c} />                         
+      <ScrollToTop />                                          
 
       <style jsx>{`
         .t3-section :global(.t3-container) { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
