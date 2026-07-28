@@ -389,11 +389,11 @@ function Hero({ d, c }) {
 function StatTile({ label, value, suffix, Icon, colorVar, shadowVar }) {
   const ref = useRef(null);
   const [val, setVal] = useState(0);
-  useEffect(() => {
+  useEffect(() => {           
     if (!ref.current) return;
-    const obs = new IntersectionObserver(([e]) => {
+    const obs = new IntersectionObserver(([e]) => {         
       if (!e.isIntersecting) return;
-      const start = performance.now(), dur = 1300;
+      const start = performance.now(), dur = 1300;           
       const tick = (t) => {
         const p = Math.min(1, (t - start) / dur);
         setVal(Math.round((1 - Math.pow(1 - p, 3)) * value));
