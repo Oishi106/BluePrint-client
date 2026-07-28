@@ -62,8 +62,8 @@ function AppShell() {
 
 export default function PortfolioApp() {
   return (
-    <PortfolioProvider>
-      <AppShell />
+    <PortfolioProvider>                   
+      <AppShell />           
     </PortfolioProvider>
   );
 }

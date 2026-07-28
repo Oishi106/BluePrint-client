@@ -6,6 +6,11 @@ import { motion, AnimatePresence, useScroll, useSpring } from "motion/react";
 function initials(name) {
   return (name || "?").split(" ").filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
 }
+function brandParts(name) {
+  const parts = (name || "Your Name").trim().split(/\s+/).filter(Boolean);
+  if (parts.length <= 1) return { first: parts[0] || "Your", last: "dev" };
+  return { first: parts.slice(0, -1).join(" "), last: parts[parts.length - 1] };
+}
 function normalizeUrl(url) {
   if (!url) return "";
   return url.match(/^https?:\/\//i) ? url : `https://${url}`;
@@ -296,7 +301,7 @@ function T3Navbar({ d, showCertificates }) {
         <nav className="t3-nav-inner">
           <button onClick={() => go("#home")} className="t3-brand">
             <span className="t3-brand-mark"><IconSparkles /></span>
-            <span>{(d.name || "Your").split(" ")[0]}<span className="grad">.dev</span></span>
+            <span>{brandParts(d.name).first}<span className="grad">.{brandParts(d.name).last}</span></span>
           </button>
           <div className="t3-links">
             {links.map((l) => (
@@ -337,11 +342,11 @@ function T3Navbar({ d, showCertificates }) {
         .t3-brand-mark { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); color: var(--p-bg); box-shadow: 0 0 24px -6px color-mix(in srgb, var(--p-accent) 60%, transparent); flex-shrink: 0; }
         .grad { background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .t3-links { display: none; align-items: center; gap: 2px; }
-        .t3-link { position: relative; display: flex; align-items: center; background: none; border: none; padding: 9px 16px; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--p-muted); cursor: pointer; white-space: nowrap; }
+        .t3-link { position: relative; display: flex; align-items: center; background: none !important; border: none !important; box-shadow: none !important; padding: 9px 16px !important; border-radius: 999px; font-size: 13.5px; font-weight: 500; color: var(--p-muted); cursor: pointer; white-space: nowrap; }
         .t3-link.active { color: var(--p-text); }
         .t3-pill { position: absolute; inset: 0; border-radius: 999px; background: color-mix(in srgb, var(--p-surface) 60%, transparent); border: 1px solid rgba(255,255,255,.1); z-index: -1; }
         .t3-nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-        .t3-hire-btn { display: none; border: none; border-radius: 12px; padding: 10px 20px; font-size: 13px; font-weight: 600; background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); color: var(--p-bg); cursor: pointer; transition: transform 0.2s; box-shadow: 0 0 24px -6px color-mix(in srgb, var(--p-accent) 60%, transparent); white-space: nowrap; }
+        .t3-hire-btn { display: none; border: none !important; border-radius: 12px !important; padding: 10px 20px !important; font-size: 13px; font-weight: 600; background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)) !important; color: var(--p-bg); cursor: pointer; transition: transform 0.2s; box-shadow: 0 0 24px -6px color-mix(in srgb, var(--p-accent) 60%, transparent); white-space: nowrap; }
         .t3-hire-btn:hover { transform: scale(1.05); }
         .t3-burger { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 12px; border: 1px solid rgba(255,255,255,.1); background: color-mix(in srgb, var(--p-surface) 45%, transparent); color: var(--p-text); flex-shrink: 0; }
         .t3-drawer-backdrop { position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.55); backdrop-filter: blur(3px); }
@@ -448,7 +453,7 @@ function Hero({ d, c }) {
 /* ================= About ================= */
 function About({ d, c }) {
   const infoCards = [
-    { icon: IconTarget, label: "Career Objective", text: c?.aboutMe ? c.aboutMe.slice(0, 110) + (c.aboutMe.length > 110 ? "…" : "") : "Building thoughtful, high-craft products end to end." },
+    { icon: IconTarget, label: "Currently Focused On", text: c?.tagline || d.role || "Building thoughtful, high-craft products end to end." },
   ];
   const statCards = [
     d.stats?.years && { label: "Experience", value: `${d.stats.years}` },
@@ -515,9 +520,9 @@ function About({ d, c }) {
         .t3-interests-tags { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
         .t3-tag { display: inline-flex; align-items: center; border-radius: 999px; border: 1px solid rgba(255,255,255,.1); background: color-mix(in srgb, var(--p-surface) 50%, transparent); padding: 6px 14px; font-size: 11.5px; font-weight: 500; color: var(--p-muted); transition: all 0.2s ease; }
         .t3-tag:hover { border-color: var(--p-accent); color: var(--p-accent); transform: translateY(-2px); }
-        .t3-about-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; align-content: start; height: 100%; }
+        .t3-about-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); grid-auto-rows: 1fr; gap: 16px; height: 100%; }
         :global(.t3-stat-mini) { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; height: 100%; min-height: 108px; box-sizing: border-box; }
-        :global(.t3-stat-mini) .val { font-size: 20px; font-weight: 700; line-height: 1.2; background: linear-gradient(135deg, var(--p-text), var(--p-accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        :global(.t3-stat-mini) .val { font-size: 18px; font-weight: 700; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; background: linear-gradient(135deg, var(--p-text), var(--p-accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
         :global(.t3-stat-mini) .lbl { margin-top: 6px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--p-muted); }
         @media (max-width: 860px) { .t3-about-grid { grid-template-columns: 1fr; } .t3-about-stats { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } }
       `}</style>
@@ -561,6 +566,11 @@ function Stats({ d }) {
 /* ================= Skills ================= */
 function Skills({ d, c }) {
   const groups = categorizeSkills(d.skills);
+  const [filled, setFilled] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setFilled(true), 150);
+    return () => clearTimeout(t);
+  }, []);
   return (
     <section id="skills" className="t3-section">
       <div className="t3-container">
@@ -582,7 +592,7 @@ function Skills({ d, c }) {
                         <div key={s} className="t3-skill-row">
                           <div className="t3-skill-row-top"><span>{s}</span><span className="pct">{pct}%</span></div>
                           <div className="t3-skill-track">
-                            <motion.div className="t3-skill-fill" initial={{ width: 0 }} whileInView={{ width: `${pct}%` }} viewport={{ once: true }} transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }} />
+                            <div className="t3-skill-fill" style={{ width: filled ? `${pct}%` : "0%" }} />
                           </div>
                         </div>
                       );
@@ -605,7 +615,7 @@ function Skills({ d, c }) {
         .t3-skill-row-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; color: var(--p-text); }
         .t3-skill-row-top .pct { color: var(--p-muted); font-variant-numeric: tabular-nums; }
         .t3-skill-track { margin-top: 8px; height: 8px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; }
-        .t3-skill-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--p-accent), var(--p-accent-2)); }
+        .t3-skill-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--p-accent), var(--p-accent-2)); transition: width 1.1s cubic-bezier(.22,1,.36,1); min-width: 3px; }
         @media (max-width: 640px) { .t3-skills-grid { grid-template-columns: 1fr; } }
       `}</style>
     </section>
@@ -622,8 +632,12 @@ function Projects({ mergedProjects, d }) {
           {mergedProjects.length ? mergedProjects.map((p, i) => (
             <Reveal key={i} delay={(i % 3) * 0.1}>
               <motion.article whileHover={{ y: -8 }} transition={{ type: "spring", stiffness: 300, damping: 24 }} className="t3-proj-card">
-                <div className="t3-proj-media" style={p.image ? { backgroundImage: `url(${p.image})` } : undefined}>
-                  {!p.image && <span>{initials(p.title)}</span>}
+                <div className="t3-proj-media-wrap">
+                  <div className="t3-proj-media" style={p.image ? { backgroundImage: `url(${p.image})` } : undefined}>
+                    {!p.image && <span>{initials(p.title)}</span>}
+                  </div>
+                  <span className="t3-proj-index">{String(i + 1).padStart(2, "0")}</span>
+                  {i === 0 && <span className="t3-proj-featured">Featured</span>}
                 </div>
                 <div className="t3-proj-body">
                   <h3>{p.title}</h3>
@@ -642,20 +656,27 @@ function Projects({ mergedProjects, d }) {
         </div>
       </div>
       <style jsx>{`
-        .t3-projects-grid { margin-top: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
-        .t3-proj-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; border: 1px solid rgba(255,255,255,.1); background: color-mix(in srgb, var(--p-surface) 45%, transparent); backdrop-filter: blur(14px); transition: border-color 0.2s ease; box-shadow: 0 10px 40px -12px rgba(0,0,0,.35); height: 100%; box-sizing: border-box; }
+        .t3-projects-grid { margin-top: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 26px; }
+        .t3-proj-card { position: relative; display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; border: 1px solid rgba(255,255,255,.1); background: color-mix(in srgb, var(--p-surface) 45%, transparent); backdrop-filter: blur(14px); transition: border-color 0.2s ease; box-shadow: 0 10px 40px -12px rgba(0,0,0,.35); height: 100%; box-sizing: border-box; }
+        .t3-proj-card::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--p-accent), var(--p-accent-2)); opacity: 0; transition: opacity 0.25s ease; z-index: 2; }
         .t3-proj-card:hover { border-color: color-mix(in srgb, var(--p-accent) 45%, transparent); }
-        .t3-proj-media { position: relative; aspect-ratio: 16/10; background-size: cover; background-position: center; background-color: color-mix(in srgb, var(--p-accent) 12%, transparent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .t3-proj-media span { font-size: 30px; color: color-mix(in srgb, var(--p-accent) 60%, var(--p-muted)); }
+        .t3-proj-card:hover::before { opacity: 1; }
+        .t3-proj-media-wrap { position: relative; overflow: hidden; flex-shrink: 0; }
+        .t3-proj-media { position: relative; aspect-ratio: 16/10; background-size: cover; background-position: center; background-color: color-mix(in srgb, var(--p-accent) 12%, transparent); display: flex; align-items: center; justify-content: center; transition: transform 0.5s ease; }
+        .t3-proj-card:hover .t3-proj-media { transform: scale(1.06); }
+        .t3-proj-media span { font-size: 30px; font-weight: 700; color: color-mix(in srgb, var(--p-accent) 65%, var(--p-muted)); }
+        .t3-proj-media-wrap::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--p-bg) 55%, transparent) 100%); pointer-events: none; }
+        .t3-proj-index { position: absolute; top: 14px; left: 14px; font-size: 12px; font-weight: 700; letter-spacing: .05em; color: var(--p-bg); background: color-mix(in srgb, var(--p-text) 92%, transparent); border-radius: 8px; padding: 4px 9px; z-index: 1; }
+        .t3-proj-featured { position: absolute; top: 14px; right: 14px; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--p-bg); background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); border-radius: 999px; padding: 5px 12px; z-index: 1; box-shadow: 0 6px 16px -4px color-mix(in srgb, var(--p-accent) 60%, transparent); }
         .t3-proj-body { flex: 1; display: flex; flex-direction: column; padding: 22px; }
-        .t3-proj-body h3 { font-size: 17px; font-weight: 700; color: var(--p-text); line-height: 1.3; }
-        .t3-proj-body p { margin-top: 8px; font-size: 12.5px; color: var(--p-muted); line-height: 1.6; flex: 1; }
+        .t3-proj-body h3 { font-size: 17px; font-weight: 700; color: var(--p-text); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+        .t3-proj-body p { margin-top: 8px; font-size: 12.5px; color: var(--p-muted); line-height: 1.65; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
         .t3-proj-chips { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 6px; }
-        .t3-proj-chips span { border-radius: 999px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04); padding: 3px 10px; font-size: 10.5px; color: var(--p-muted); }
+        .t3-proj-chips span { display: inline-flex; align-items: center; border-radius: 999px; border: 1px solid color-mix(in srgb, var(--p-accent) 30%, transparent); background: color-mix(in srgb, var(--p-accent) 10%, transparent); padding: 4px 11px; font-size: 10.5px; font-weight: 500; color: var(--p-accent); }
         .t3-proj-actions { margin-top: 18px; display: flex; gap: 10px; }
-        .t3-proj-live, .t3-proj-code { display: inline-flex; flex: 1; align-items: center; justify-content: center; gap: 6px; border-radius: 12px; padding: 10px; font-size: 11.5px; font-weight: 600; text-decoration: none; transition: transform 0.2s; box-sizing: border-box; }
-        .t3-proj-live { background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); color: var(--p-bg); }
-        .t3-proj-code { border: 1px solid rgba(255,255,255,.12); color: var(--p-text); }
+        .t3-proj-live, .t3-proj-code { display: inline-flex; flex: 1; align-items: center; justify-content: center; gap: 6px; border-radius: 12px !important; padding: 10px !important; font-size: 11.5px; font-weight: 600; text-decoration: none; transition: transform 0.2s; box-sizing: border-box; }
+        .t3-proj-live { background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)) !important; color: var(--p-bg); border: none !important; }
+        .t3-proj-code { border: 1px solid rgba(255,255,255,.12) !important; color: var(--p-text); background: rgba(255,255,255,.02) !important; }
         .t3-proj-live:hover, .t3-proj-code:hover { transform: scale(1.03); }
       `}</style>
     </section>
@@ -664,68 +685,54 @@ function Projects({ mergedProjects, d }) {
 
 /* ================= Certificates (modal) ================= */
 function Certificates({ d }) {
-  const [selected, setSelected] = useState(null);
   if (!d.certificates?.length) return null;
   return (
     <section id="certificates" className="t3-section">
       <div className="t3-container">
         <SectionHeading eyebrow="Certificates" title="Credentials &amp; achievements" subtitle="Continuous learning is part of the craft." />
         <div className="t3-cert-grid">
-          {d.certificates.map((cert, i) => (
-            <Reveal key={i} delay={(i % 4) * 0.08}>
-              <div role="button" tabIndex={0} onClick={() => setSelected(cert)} onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && setSelected(cert)} className="t3-cert-card">
-                <div className="t3-cert-top">
-                  <span className="t3-cert-icon">{cert.image ? <img src={cert.image} alt="" /> : <IconAward />}</span>
-                  <IconExternalLink />
-                </div>
-                <h3>{cert.title}</h3>
-                <p className="issuer">{cert.issuer}</p>
-                <p className="date">{cert.year}</p>
-              </div>
-            </Reveal>
-          ))}
+          {d.certificates.map((cert, i) => {
+            const CardTag = cert.link ? "a" : "div";
+            const cardProps = cert.link ? { href: normalizeUrl(cert.link), target: "_blank", rel: "noopener noreferrer" } : {};
+            return (
+              <Reveal key={i} delay={(i % 4) * 0.08}>
+                <CardTag {...cardProps} className="t3-cert-card">
+                  <div className="t3-cert-media">
+                    {cert.image ? <img src={cert.image} alt="" /> : <IconAward />}
+                    <span className="t3-cert-badge"><IconAward /></span>
+                  </div>
+                  <div className="t3-cert-body">
+                    <h3>{cert.title || "Untitled Certificate"}</h3>
+                    <div className="t3-cert-meta">
+                      {cert.issuer && <span className="t3-cert-issuer">{cert.issuer}</span>}
+                      {cert.year && <span className="t3-cert-year">{cert.year}</span>}
+                    </div>
+                    {cert.link && <span className="t3-cert-view">View credential <IconExternalLink /></span>}
+                  </div>
+                </CardTag>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
 
-      <AnimatePresence>
-        {selected && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="t3-modal-backdrop" onClick={() => setSelected(null)}>
-            <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.94 }} onClick={(e) => e.stopPropagation()} className="t3-modal">
-              <button aria-label="Close" onClick={() => setSelected(null)} className="t3-modal-close"><IconX /></button>
-              <div className="t3-modal-head">
-                <span className="t3-cert-icon lg">{selected.image ? <img src={selected.image} alt="" /> : <IconAward />}</span>
-                <div>
-                  <h3>{selected.title}</h3>
-                  <p className="issuer">{selected.issuer}</p>
-                  <p className="date">{selected.year}</p>
-                </div>
-              </div>
-              {selected.image && <div className="t3-modal-img"><img src={selected.image} alt={selected.title} /></div>}
-              {selected.link && <a href={normalizeUrl(selected.link)} target="_blank" rel="noopener noreferrer" className="t3-modal-link"><IconExternalLink /> View credential</a>}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <style jsx>{`
-        .t3-cert-grid { margin-top: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
-        .t3-cert-card { cursor: pointer; display: flex; flex-direction: column; height: 100%; border-radius: 24px; border: 1px solid rgba(255,255,255,.1); background: color-mix(in srgb, var(--p-surface) 45%, transparent); backdrop-filter: blur(14px); padding: 22px; transition: all 0.25s ease; box-sizing: border-box; }
-        .t3-cert-card:hover { transform: translateY(-6px); border-color: color-mix(in srgb, var(--p-accent) 45%, transparent); }
-        .t3-cert-top { display: flex; align-items: flex-start; justify-content: space-between; color: var(--p-muted); }
-        .t3-cert-icon { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 16px; overflow: hidden; background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); color: var(--p-bg); flex-shrink: 0; }
-        .t3-cert-icon img { width: 100%; height: 100%; object-fit: cover; }
-        .t3-cert-icon.lg { width: 64px; height: 64px; flex-shrink: 0; }
-        .t3-cert-card h3 { margin-top: 18px; font-size: 14.5px; font-weight: 600; color: var(--p-text); line-height: 1.4; }
-        .t3-cert-card .issuer { margin-top: 4px; font-size: 12.5px; background: linear-gradient(135deg, var(--p-text), var(--p-accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .t3-cert-card .date { margin-top: auto; padding-top: 14px; font-size: 11px; color: var(--p-muted); }
-        .t3-modal-backdrop { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(0,0,0,.7); backdrop-filter: blur(4px); }
-        .t3-modal { position: relative; width: 100%; max-width: 480px; border-radius: 26px; padding: 28px; background: color-mix(in srgb, var(--p-bg) 92%, transparent); border: 1px solid rgba(255,255,255,.12); box-shadow: 0 30px 80px -20px rgba(0,0,0,.6); box-sizing: border-box; }
-        .t3-modal-close { position: absolute; right: 16px; top: 16px; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.06); border: none; color: var(--p-muted); }
-        .t3-modal-head { display: flex; align-items: center; gap: 16px; }
-        .t3-modal-head h3 { font-size: 16px; font-weight: 600; color: var(--p-text); line-height: 1.35; }
-        .t3-modal-img { margin-top: 22px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,.1); }
-        .t3-modal-img img { width: 100%; object-fit: cover; display: block; }
-        .t3-modal-link { margin-top: 18px; display: inline-flex; align-items: center; gap: 6px; color: var(--p-accent); text-decoration: none; font-size: 13px; font-weight: 600; }
+        .t3-cert-grid { margin-top: 56px; display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 24px; }
+        .t3-cert-card { text-decoration: none; cursor: default; display: flex; flex-direction: column; height: 100%; overflow: hidden; border-radius: 24px; border: 1px solid rgba(255,255,255,.1); background: color-mix(in srgb, var(--p-surface) 45%, transparent); backdrop-filter: blur(14px); transition: all 0.25s ease; box-sizing: border-box; box-shadow: 0 10px 34px -14px rgba(0,0,0,.4); }
+        a.t3-cert-card { cursor: pointer; }
+        .t3-cert-card:hover { transform: translateY(-6px); border-color: color-mix(in srgb, var(--p-accent) 45%, transparent); box-shadow: 0 16px 40px -12px color-mix(in srgb, var(--p-accent) 30%, transparent); }
+        .t3-cert-media { position: relative; aspect-ratio: 16/10; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, color-mix(in srgb, var(--p-accent) 18%, transparent), color-mix(in srgb, var(--p-accent-2) 10%, transparent)); color: var(--p-accent); }
+        .t3-cert-media svg { width: 40px; height: 40px; opacity: 0.55; }
+        .t3-cert-media img { width: 100%; height: 100%; object-fit: contain; padding: 18px; box-sizing: border-box; }
+        .t3-cert-badge { position: absolute; bottom: 10px; right: 10px; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); color: var(--p-bg); box-shadow: 0 6px 16px -4px color-mix(in srgb, var(--p-accent) 60%, transparent); }
+        .t3-cert-badge svg { width: 14px; height: 14px; opacity: 1; }
+        .t3-cert-body { flex: 1; display: flex; flex-direction: column; padding: 20px 22px 22px; }
+        .t3-cert-body h3 { font-size: 15px; font-weight: 700; color: var(--p-text); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .t3-cert-meta { margin-top: 10px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .t3-cert-issuer { font-size: 12.5px; font-weight: 600; color: var(--p-accent); }
+        .t3-cert-year { font-size: 11px; font-weight: 600; color: var(--p-muted); border: 1px solid rgba(255,255,255,.12); border-radius: 999px; padding: 2px 10px; }
+        .t3-cert-view { margin-top: auto; padding-top: 16px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--p-muted); transition: color 0.2s ease; }
+        .t3-cert-card:hover .t3-cert-view { color: var(--p-accent); }
         @media (max-width: 560px) { .t3-cert-grid { grid-template-columns: 1fr; } }
       `}</style>
     </section>
@@ -792,9 +799,9 @@ function FloatingField({ id, label, value, onChange, error, type = "text", texta
   return (
     <div className="t3-field">
       {textarea ? (
-        <textarea id={id} rows={4} placeholder={label} value={value} onChange={(e) => onChange(e.target.value)} className={`t3-input ${error ? "err" : ""}`} />
+        <textarea id={id} rows={4} placeholder=" " value={value} onChange={(e) => onChange(e.target.value)} className={`t3-input ${error ? "err" : ""}`} />
       ) : (
-        <input id={id} type={type} placeholder={label} value={value} onChange={(e) => onChange(e.target.value)} className={`t3-input ${error ? "err" : ""}`} />
+        <input id={id} type={type} placeholder=" " value={value} onChange={(e) => onChange(e.target.value)} className={`t3-input ${error ? "err" : ""}`} />
       )}
       <label htmlFor={id}>{label}</label>
       {error && <p className="t3-field-err">{error}</p>}
@@ -905,60 +912,86 @@ function T3Footer({ d, c }) {
 
   return (
     <footer className="t3-footer">
+      <div className="t3-footer-glow" />
       <div className="t3-container">
-        <div className="t3-footer-grid">
-          <div className="t3-footer-about">
-            <button onClick={() => go("home")} className="t3-footer-brand">
-              <span className="t3-footer-mark"><IconSparkles /></span>
-              {(d.name || "Your").split(" ")[0]}<span className="grad">.dev</span>
-            </button>
-            <p className="t3-footer-tag">{c?.tagline || "Crafting premium, production-ready products."}</p>
-          </div>
-          <div className="t3-footer-col">
-            <h4>Navigation</h4>
-            <div className="t3-footer-nav">
-              {NAV_LINKS.map((l) => (
-                <motion.button key={l.href} onClick={() => go(l.href.slice(1))} whileHover={{ x: 4 }} className="t3-footer-link">{l.label}</motion.button>
-              ))}
+        <div className="t3-footer-panel">
+          <div className="t3-footer-grid">
+            <div className="t3-footer-about">
+              <button onClick={() => go("home")} className="t3-footer-brand">
+                <span className="t3-footer-mark"><IconSparkles /></span>
+                {brandParts(d.name).first}<span className="grad">.{brandParts(d.name).last}</span>
+              </button>
+              <p className="t3-footer-tag">{c?.tagline || "Crafting premium, production-ready products."}</p>
+            </div>
+            <div className="t3-footer-col">
+              <h4>Navigation</h4>
+              <div className="t3-footer-nav">
+                {NAV_LINKS.map((l) => (
+                  <motion.button key={l.href} onClick={() => go(l.href.slice(1))} whileHover={{ x: 4 }} className="t3-footer-link">
+                    <span className="t3-footer-link-dot" />{l.label}
+                  </motion.button>
+                ))}
+              </div>
+            </div>
+            <div className="t3-footer-col">
+              <h4>Connect</h4>
+              <div className="t3-footer-socials">
+                {socials.map(({ href, label, Icon }) => (
+                  <motion.a
+                    key={label}
+                    href={href}
+                    target={label === "Email" ? undefined : "_blank"}
+                    rel="noopener noreferrer"
+                    aria-label={label}
+                    title={label}
+                    whileHover={{ y: -4, scale: 1.08 }}
+                    whileTap={{ scale: 0.92 }}
+                    className="t3-footer-social"
+                  >
+                    <Icon />
+                  </motion.a>
+                ))}
+              </div>
             </div>
           </div>
-          <div className="t3-footer-col">
-            <h4>Connect</h4>
-            <div className="t3-footer-socials">
-              {socials.map(({ href, label, Icon }) => (
-                <motion.a key={label} href={href} target={label === "Email" ? undefined : "_blank"} rel="noopener noreferrer" aria-label={label} whileHover={{ y: -4, scale: 1.1 }} whileTap={{ scale: 0.92 }} className="t3-footer-social">
-                  <Icon />
-                </motion.a>
-              ))}
-            </div>
+          <div className="t3-footer-bottom">
+            <p>© {new Date().getFullYear()} {d.name || "Your Name"}. All rights reserved.</p>
+            <motion.button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} whileHover={{ y: -3, scale: 1.04 }} whileTap={{ scale: 0.96 }} className="t3-footer-top">
+              Back to top <IconArrowUp />
+            </motion.button>
           </div>
-        </div>
-        <div className="t3-footer-bottom">
-          <p>© {new Date().getFullYear()} {d.name || "Your Name"}. All rights reserved.</p>
-          <motion.button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} whileHover={{ y: -3, scale: 1.03 }} whileTap={{ scale: 0.96 }} className="t3-footer-top">
-            Back to top <IconArrowUp />
-          </motion.button>
         </div>
       </div>
       <style jsx>{`
-        .t3-footer { position: relative; border-top: 1px solid rgba(255,255,255,.08); padding: 56px 0; }
-        .t3-footer-grid { display: grid; gap: 40px; grid-template-columns: 1.4fr 1fr 1fr; }
-        .t3-footer-brand { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; background: none; border: none; color: var(--p-text); cursor: pointer; }
-        .t3-footer-mark { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); color: var(--p-bg); flex-shrink: 0; }
+        .t3-footer { position: relative; padding: 72px 0 56px; overflow: hidden; }
+        .t3-footer-glow { position: absolute; left: 50%; top: 0; width: 60%; max-width: 640px; height: 220px; transform: translate(-50%, -60%); border-radius: 50%; background: color-mix(in srgb, var(--p-accent) 20%, transparent); filter: blur(90px); pointer-events: none; }
+        .t3-footer-panel { position: relative; z-index: 1; border-radius: 32px; border: 1px solid rgba(255,255,255,.1); background: color-mix(in srgb, var(--p-surface) 45%, transparent); backdrop-filter: blur(16px); padding: 44px 40px 28px; box-shadow: 0 20px 60px -20px rgba(0,0,0,.45); box-sizing: border-box; }
+        .t3-footer-grid { display: grid; gap: 40px; grid-template-columns: 1.4fr 1fr 1fr; padding-bottom: 32px; border-bottom: 1px solid rgba(255,255,255,.08); }
+        .t3-footer-brand { display: inline-flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; background: none; border: none; color: var(--p-text); cursor: pointer; }
+        .t3-footer-mark { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); color: var(--p-bg); flex-shrink: 0; box-shadow: 0 0 26px -6px color-mix(in srgb, var(--p-accent) 65%, transparent); }
         .grad { background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .t3-footer-tag { margin-top: 14px; max-width: 300px; font-size: 13px; color: var(--p-muted); line-height: 1.6; }
-        .t3-footer-grid h4 { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--p-text); }
-        .t3-footer-nav { margin-top: 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
-        .t3-footer-link { text-align: left; background: none; border: none; color: var(--p-muted); font-size: 13px; cursor: pointer; padding: 0; }
+        .t3-footer-tag { margin-top: 14px; max-width: 300px; font-size: 13px; color: var(--p-muted); line-height: 1.65; }
+        .t3-footer-grid h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--p-text); }
+        .t3-footer-nav { margin-top: 16px; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+        .t3-footer-link { display: inline-flex !important; align-items: center; gap: 10px; text-align: left; background: none !important; border: none !important; box-shadow: none !important; color: var(--p-muted); font-size: 13.5px; cursor: pointer; padding: 2px 0 !important; transition: color 0.2s; }
+        .t3-footer-link-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--p-muted); transition: all 0.2s; flex-shrink: 0; }
         .t3-footer-link:hover { color: var(--p-accent); }
-        .t3-footer-socials { margin-top: 14px; display: flex; gap: 10px; }
-        .t3-footer-social { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 14px; border: 1px solid rgba(255,255,255,.1); background: color-mix(in srgb, var(--p-surface) 45%, transparent); color: var(--p-muted); text-decoration: none; flex-shrink: 0; }
-        .t3-footer-social:hover { color: var(--p-bg); background: var(--p-accent); border-color: var(--p-accent); }
-        .t3-footer-bottom { margin-top: 48px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.08); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px; }
+        .t3-footer-link:hover .t3-footer-link-dot { background: var(--p-accent); box-shadow: 0 0 8px var(--p-accent); transform: scale(1.4); }
+        .t3-footer-socials { margin-top: 16px; display: flex; gap: 12px; }
+        .t3-footer-social { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 14px; border: 1px solid rgba(255,255,255,.12); background: color-mix(in srgb, var(--p-surface) 55%, transparent); backdrop-filter: blur(10px); color: var(--p-muted); text-decoration: none; flex-shrink: 0; transition: all 0.25s ease; }
+        .t3-footer-social:hover { color: var(--p-bg); background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); border-color: transparent; box-shadow: 0 10px 26px -8px color-mix(in srgb, var(--p-accent) 60%, transparent); }
+        .t3-footer-bottom { margin-top: 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
         .t3-footer-bottom p { font-size: 12.5px; color: var(--p-muted); }
-        .t3-footer-top { display: inline-flex; align-items: center; gap: 8px; border-radius: 14px; border: 1px solid rgba(255,255,255,.1); background: color-mix(in srgb, var(--p-surface) 45%, transparent); padding: 9px 18px; font-size: 13px; font-weight: 500; color: var(--p-text); cursor: pointer; }
-        .t3-footer-top:hover { border-color: var(--p-accent); }
-        @media (max-width: 720px) { .t3-footer-grid { grid-template-columns: 1fr; text-align: center; } .t3-footer-about { display: flex; flex-direction: column; align-items: center; } .t3-footer-col { display: flex; flex-direction: column; align-items: center; } .t3-footer-nav { align-items: center; } .t3-footer-bottom { justify-content: center; text-align: center; } }
+        .t3-footer-top { display: inline-flex !important; align-items: center; gap: 8px; border-radius: 999px !important; border: 1px solid color-mix(in srgb, var(--p-accent) 45%, transparent) !important; background: color-mix(in srgb, var(--p-accent) 14%, transparent) !important; box-shadow: none !important; padding: 10px 20px !important; font-size: 13px; font-weight: 600; color: var(--p-accent); cursor: pointer; transition: all 0.2s; }
+        .t3-footer-top:hover { background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)) !important; color: var(--p-bg); border-color: transparent !important; box-shadow: 0 10px 30px -8px color-mix(in srgb, var(--p-accent) 60%, transparent) !important; }
+        @media (max-width: 720px) {
+          .t3-footer-panel { padding: 36px 22px 24px; }
+          .t3-footer-grid { grid-template-columns: 1fr; text-align: center; }
+          .t3-footer-about { display: flex; flex-direction: column; align-items: center; }
+          .t3-footer-col { display: flex; flex-direction: column; align-items: center; }
+          .t3-footer-nav { align-items: center; }
+          .t3-footer-bottom { flex-direction: column; text-align: center; }
+        }
       `}</style>
     </footer>
   );
@@ -968,22 +1001,25 @@ function T3Footer({ d, c }) {
 function ScrollToTop() {
   const [show, setShow] = useState(false);
   useEffect(() => {
-    const onScroll = () => setShow(window.scrollY > 600);
+    const onScroll = () => setShow(window.scrollY > 500);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   return (
-    <AnimatePresence>
-      {show && (
-        <motion.button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top" initial={{ opacity: 0, scale: 0.6, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.6, y: 20 }} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.92 }} className="t3-scrolltop">
-          <IconArrowUp />
-          <style jsx>{`
-            .t3-scrolltop { position: fixed; bottom: 24px; right: 24px; z-index: 60; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 18px; border: none; cursor: pointer; background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); color: var(--p-bg); box-shadow: 0 12px 34px -10px color-mix(in srgb, var(--p-accent) 65%, transparent); }
-          `}</style>
-        </motion.button>
-      )}
-    </AnimatePresence>
+    <div className="t3-scrolltop-wrap">
+      <AnimatePresence>
+        {show && (
+          <motion.button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} aria-label="Back to top" title="Back to top" initial={{ opacity: 0, scale: 0.6 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.6 }} whileHover={{ scale: 1.1, y: -3 }} whileTap={{ scale: 0.92 }} className="t3-scrolltop">
+            <IconArrowUp />
+          </motion.button>
+        )}
+      </AnimatePresence>
+      <style jsx>{`
+        .t3-scrolltop-wrap { position: sticky; bottom: 22px; z-index: 60; height: 0; display: flex; justify-content: flex-end; pointer-events: none; }
+        .t3-scrolltop { pointer-events: auto; margin-right: 22px; display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer; background: linear-gradient(135deg, var(--p-accent), var(--p-accent-2)); color: var(--p-bg); box-shadow: 0 14px 36px -10px color-mix(in srgb, var(--p-accent) 70%, transparent); }
+      `}</style>
+    </div>
   );
 }
 
@@ -1027,24 +1063,24 @@ export default function TemplateThree({ data }) {
 
       <Hero d={d} c={c} />
       <Stats d={d} />
-      <About d={d} c={c} />                 
-      <Skills d={d} c={c} />                        
+      <About d={d} c={c} />
+      <Skills d={d} c={c} />
       <Projects mergedProjects={mergedProjects} d={d} />
       <Certificates d={d} />
-      <TimelineSection d={d} />                    
-      <Contact d={d} />            
+      <TimelineSection d={d} />
+      <Contact d={d} />
 
-      <T3Footer d={d} c={c} />                         
-      <ScrollToTop />                                          
+      <T3Footer d={d} c={c} />
+      <ScrollToTop />
 
-      <style jsx>{`
-        .t3-section :global(.t3-container) { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
-      `}</style>
       <style jsx global>{`
         .portfolio-frame.tmpl-glass * { box-sizing: border-box; }
         .portfolio-frame.tmpl-glass .t3-section { position: relative; padding: 96px 0; }
-        .portfolio-frame.tmpl-glass button { font-family: inherit; }
-      `}</style>     
-    </div>    
+        .portfolio-frame.tmpl-glass .t3-container { position: relative; z-index: 1; max-width: 1120px; width: 100%; margin: 0 auto; padding: 0 24px; box-sizing: border-box; }
+        .portfolio-frame.tmpl-glass button { font-family: inherit; appearance: none; -webkit-appearance: none; border: none; background: none; margin: 0; padding: 0; outline: none; }
+        .portfolio-frame.tmpl-glass button:focus { outline: none; }
+        .portfolio-frame.tmpl-glass a { -webkit-tap-highlight-color: transparent; }
+      `}</style>
+    </div>
   );
 }
